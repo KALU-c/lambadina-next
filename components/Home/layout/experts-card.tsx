@@ -5,8 +5,8 @@ import {
 } from "@/components/ui/card"
 // import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
-import type { MentorProfile } from "@/types/mentor"
 import Link from "next/link"
+import { MentorProfile } from "@/types/mentors"
 
 const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
   // const [liked, setLiked] = useState(false);
@@ -15,7 +15,7 @@ const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
     id,
     user,
     bio,
-    price_per_minute
+    pricePerMinute
   } = mentor;
 
   return (
@@ -25,7 +25,7 @@ const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
           <Link href={`/mentors/${id}`}>
             {/* TODO - add fallback image */}
             <img
-              src={user.profile_picture}
+              src={user.profilePicture ?? ''}
               className="w-[210px] h-[240px] object-cover rounded-[8px]"
             />
           </Link>
@@ -45,10 +45,10 @@ const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
         <Link href={`/mentors/${id}`}>
           <div>
             <h2 className="font-medium text-lg flex flex-row gap-[2px] items-center">
-              {user.first_name}{" "}{user.last_name}
-              {user.is_verified && <BadgeCheck fill="#ffb102" color="#ffffff" size={20} />}
+              {user.firstName}{" "}{user.lastName}
+              {user.isVerified && <BadgeCheck fill="#ffb102" color="#ffffff" size={20} />}
             </h2>
-            <p>ETB {price_per_minute} • Session</p>
+            <p>ETB {pricePerMinute} • Session</p>
             <p className="mt-1 text-md text-muted-foreground line-clamp-3">
               {bio}
             </p>

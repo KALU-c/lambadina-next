@@ -9,8 +9,10 @@ import { Separator } from "@/components/ui/separator"
 import CTA from "./CTA"
 import { Suspense, useState, useMemo, useEffect, useRef } from "react"
 import ExpertsCardSkeleton from "./layout/experts-card-skeleton"
-import type { Category, MentorProfile } from "@/types/mentor"
 import { useTranslation } from "react-i18next"
+import { getMentors } from "@/actions/mentors"
+import { Category, MentorProfile } from "@/types/mentors"
+import { toast } from "sonner"
 
 const HomeLayout = () => {
   const { t } = useTranslation();
@@ -33,13 +35,19 @@ const HomeLayout = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [mentorsRes, categoriesRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/`),
+        const [{ mentors: mentorsData }, categoriesRes] = await Promise.all([
+          getMentors(),
+          // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/categories/`),
         ])
 
-        const mentorsData = await mentorsRes.json()
+        // const mentorsData = await mentorsRes;
         const categoriesData = await categoriesRes.json()
+
+        if (mentorsData.length === 0) {
+          toast.error("")
+          return;
+        }
 
         setMentors(mentorsData)
         setCategories(categoriesData)
@@ -58,7 +66,7 @@ const HomeLayout = () => {
     let results = mentors
 
     if (activeTab === 'top-experts') {
-      results = results.filter(mentor => parseFloat(mentor.rating) >= 4.5)
+      results = results.filter(mentor => mentor.rating >= 4.5)
     } else if (activeTab === 'business-experts') {
       results = results.filter(mentor =>
         mentor.categories.some((category: Category) =>
@@ -75,14 +83,15 @@ const HomeLayout = () => {
     }
 
     if (search.trim()) {
-      const searchLower = search.toLowerCase()
+      const searchLower = search.toLowerCase();
       results = results.filter(mentor =>
-        mentor.user.first_name.toLowerCase().includes(searchLower) ||
-        mentor.user.last_name.toLowerCase().includes(searchLower) ||
+        (mentor.user.firstName?.toLowerCase() ?? "").includes(searchLower) ||
+        (mentor.user.lastName?.toLowerCase() ?? "").includes(searchLower) ||
         mentor.bio.toLowerCase().includes(searchLower) ||
         mentor.categories.some((category: Category) =>
-          category.name.toLowerCase().includes(searchLower))
-      )
+          category.name.toLowerCase().includes(searchLower)
+        )
+      );
     }
 
     return results
@@ -176,7 +185,7 @@ const HomeLayout = () => {
                   mainText="top_experts_title"
                   text="top_experts_text"
                 />
-                {renderMentorsList(mentors.filter(mentor => parseFloat(mentor.rating) >= 4.5))}
+                {renderMentorsList(mentors.filter(mentor => mentor.rating >= 4.5))}
               </TabsContent>
 
               <TabsContent value="business-experts">

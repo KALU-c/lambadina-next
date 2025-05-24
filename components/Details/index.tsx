@@ -11,10 +11,12 @@ import CTA from "../Home/CTA";
 import FAQ from "./FAQ-accordion";
 import Footer from "../Footer";
 import { useEffect, useRef, useState } from "react";
-import type { MentorProfile } from "@/types/mentor";
+// import type { MentorProfile } from "@/types/mentor";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
+import { Mentor } from "@prisma/client";
+import { MentorProfile } from "@/types/mentors";
 
 type DetailsParams = {
   mentorId: string
@@ -68,13 +70,13 @@ const Details = ({ mentorId }: DetailsParams) => {
           <Link href={"/"}>{t("details_breadcrumb_home")}</Link>
           /
           <span className="text-muted-foreground">
-            {mentor.user.first_name ?? ''} {mentor.user.last_name ?? ''}
+            {mentor.user.firstName ?? ''} {mentor.user.lastName ?? ''}
           </span>
         </div>
 
         <Profile
-          src={mentor.user.profile_picture ?? "/"}
-          name={`${mentor.user.first_name ?? ''} ${mentor.user.last_name ?? ''}`}
+          src={mentor.user.profilePicture ?? "/"}
+          name={`${mentor.user.firstName ?? ''} ${mentor.user.lastName ?? ''}`}
         />
         <Separator />
 
@@ -83,7 +85,7 @@ const Details = ({ mentorId }: DetailsParams) => {
             <div className="flex flex-col gap-0">
               <p className="text-muted-foreground text-lg">{t("details_starting_from")}</p>
               <p className="text-xl font-medium">
-                {mentor.price_per_minute ?? ''} {t("details_currency")}
+                {mentor.pricePerMinute ?? ''} {t("details_currency")}
               </p>
             </div>
             <Button

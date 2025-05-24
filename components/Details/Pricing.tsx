@@ -5,9 +5,9 @@ import { Button } from "../ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./layout/pricing-tabs"
 import { nanoid } from 'nanoid'
 import { useAuth } from "@/hooks/useAuth"
-import type { MentorProfile } from "@/types/mentor"
 import { toast } from "sonner"
 import Link from "next/link"
+import { MentorProfile } from "@/types/mentors"
 
 type PricingProps = {
   ref: React.RefObject<null | HTMLDivElement>
@@ -41,7 +41,7 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
         <form method="POST" action="https://api.chapa.co/v1/hosted/pay">
           <input type="hidden" name="public_key" value={process.env.NEXT_PUBLIC_CHAPA_PUBLIC_API_KEY} />
           <input type="hidden" name="tx_ref" value={txRef} onSubmit={() => setTxRef(nanoid())} />
-          <input type="hidden" name="amount" value={mentor.price_per_minute} />
+          <input type="hidden" name="amount" value={mentor.pricePerMinute} />
           <input type="hidden" name="currency" value="ETB" />
           <input type="hidden" name="email" value="endekaluzemenu2134@gmail.com" />
           <input type="hidden" name="first_name" value="Endekalu" />

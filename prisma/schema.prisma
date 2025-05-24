@@ -39,18 +39,18 @@ model User {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  Client Client?
-  Mentor Mentor?
+  client Client?
+  mentor Mentor?
 
-  UserGroups      UserGroup[]
-  UserPermissions UserUserPermission[]
+  userGroups      UserGroup[]
+  userPermissions UserUserPermission[]
 }
 
 model UserGroup {
   id      Int  @id @default(autoincrement())
   userId  Int  @map("user_id")
   groupId Int  @map("group_id")
-  User    User @relation(fields: [userId], references: [id])
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, groupId])
 }
@@ -59,7 +59,7 @@ model UserUserPermission {
   id           Int  @id @default(autoincrement())
   userId       Int  @map("user_id")
   permissionId Int  @map("permission_id")
-  User         User @relation(fields: [userId], references: [id])
+  User         User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, permissionId])
 }
@@ -68,21 +68,23 @@ model Client {
   id            Int      @id @default(autoincrement())
   interests     String
   totalSessions Int      @map("total_sessions")
-  createdAt     DateTime @map("created_at")
-  updatedAt     DateTime @map("updated_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
   userId        Int      @unique @map("user_id")
 
-  user    User      @relation(fields: [userId], references: [id])
-  Booking Booking[]
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking Booking[]
 }
 
 model Category {
   id          Int      @id @default(autoincrement())
   name        String
   description String
-  createdAt   DateTime @map("created_at")
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  MentorCategories MentorCategory[]
+  mentorCategories MentorCategory[]
+  mentor           Mentor?          @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  mentorId         Int?
 }
 
 model Mentor {
@@ -92,22 +94,23 @@ model Mentor {
   isAvailable    Boolean  @map("is_available")
   rating         Float
   totalSessions  Int      @map("total_sessions")
-  createdAt      DateTime @map("created_at")
-  updatedAt      DateTime @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
   userId         Int      @unique @map("user_id")
 
-  user             User                 @relation(fields: [userId], references: [id])
-  MentorCategories MentorCategory[]
-  Availabilities   MentorAvailability[]
-  Booking          Booking[]
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mentorCategories MentorCategory[]
+  availabilities   MentorAvailability[]
+  booking          Booking[]
+  categories       Category[]
 }
 
 model MentorCategory {
   id         Int      @id @default(autoincrement())
   mentorId   Int      @map("mentor_id")
   categoryId Int      @map("category_id")
-  Category   Category @relation(fields: [categoryId], references: [id])
-  Mentor     Mentor   @relation(fields: [mentorId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  mentor     Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
 
   @@unique([mentorId, categoryId])
 }
@@ -115,18 +118,18 @@ model MentorCategory {
 model MentorAvailability {
   id          Int      @id @default(autoincrement())
   dayOfWeek   Int      @map("day_of_week")
-  startTime   DateTime @map("start_time") // Prisma does not have TIME, use DateTime or String
+  startTime   DateTime @map("start_time")
   endTime     DateTime @map("end_time")
   isAvailable Boolean  @map("is_available")
   mentorId    Int      @map("mentor_id")
-  Mentor      Mentor   @relation(fields: [mentorId], references: [id])
+  mentor      Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
 
   @@unique([mentorId, dayOfWeek, startTime, endTime])
 }
 
 model Booking {
   id              Int      @id @default(autoincrement())
-  sessionDate     DateTime @map("session_date") // Use DateTime, ignore time part if needed
+  sessionDate     DateTime @map("session_date")
   startTime       DateTime @map("start_time")
   endTime         DateTime @map("end_time")
   durationMinutes Int      @map("duration_minutes")
@@ -137,25 +140,25 @@ model Booking {
   mentorPayout    Float    @map("mentor_payout")
   paymentStatus   Boolean  @map("payment_status")
   callLink        String?  @map("call_link")
-  createdAt       DateTime @map("created_at")
-  updatedAt       DateTime @map("updated_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
   clientId        Int      @map("client_id")
   mentorId        Int      @map("mentor_id")
 
-  Client  Client         @relation(fields: [clientId], references: [id])
-  Mentor  Mentor         @relation(fields: [mentorId], references: [id])
-  Review  BookingReview?
-  Payment Payment?
+  client  Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  mentor  Mentor         @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  review  BookingReview?
+  payment Payment?
 }
 
 model BookingReview {
   id        Int      @id @default(autoincrement())
   rating    Int
   comment   String
-  createdAt DateTime @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
   bookingId Int      @unique @map("booking_id")
 
-  Booking Booking @relation(fields: [bookingId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }
 
 model Payment {
@@ -165,9 +168,9 @@ model Payment {
   currency            String
   status              String
   chapaTransactionRef String   @map("chapa_transaction_ref")
-  createdAt           DateTime @map("created_at")
-  updatedAt           DateTime @map("updated_at")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
   bookingId           Int      @unique @map("booking_id")
 
-  Booking Booking @relation(fields: [bookingId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }

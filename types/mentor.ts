@@ -14,7 +14,7 @@ export type Category = {
   id: number;
   name: string;
   description: string;
-  created_at: string;
+  createdAt: string;
 };
 
 type Availability = {
