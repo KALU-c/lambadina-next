@@ -89,7 +89,7 @@ model Category {
 
 model Mentor {
   id            Int      @id @default(autoincrement())
-  bio           String
+  bio           String   @db.Text
   isAvailable   Boolean  @map("is_available")
   rating        Float
   totalSessions Int      @map("total_sessions")
