@@ -8,11 +8,11 @@ import { Button } from "../ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
 import { Activity, Check, Star, X } from "lucide-react"
 import { useEffect, useState } from "react"
-import axios from "axios"
-import type { Booking } from "@/types/booking"
 import { toast } from "sonner"
 import Link from "next/link"
 import Image from "next/image"
+import { getBookingList } from "@/actions/booking"
+import { Booking } from "@/types"
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -23,16 +23,15 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/list`, {
-          headers: {
-            "Authorization": `Bearer ${accessToken}`,
-            "Content-Type": "application/json"
-          }
-        });
+        const { bookings: allBookings, error } = await getBookingList(accessToken ?? "");
 
-        if (response.data) {
-          const filterBooked = response.data.filter((bookings: Booking) => bookings.status === 'confirmed');
-          const filterPending = response.data.filter((bookings: Booking) => bookings.status === 'pending');
+        if (!bookings) {
+          toast.error(error);
+        }
+
+        if (allBookings) {
+          const filterBooked = allBookings.filter((bookings: Booking) => bookings.status === 'COMPLETED');
+          const filterPending = allBookings.filter((bookings: Booking) => bookings.status === 'PENDING');
           setBooked(filterBooked);
           setBookings(filterPending);
         }
@@ -61,25 +60,25 @@ const Dashboard = () => {
           <div className="flex flex-col space-y-6">
             {booked.length > 0 && (
               <>
-                {booked.map(({ client: { user }, session_date, amount_paid, duration_minutes }, index) => (
+                {booked.map(({ client, sessionDate, amountPaid, durationMinutes }, index) => (
                   <div className="flex flex-col gap-3 bg-zinc-100 p-4 rounded-[8px]" key={index}>
                     <span className="text-xl font-medium">{t("dashboard_upcoming_call")}</span>
 
                     <div className="flex flex-col gap-0">
-                      <span className="text-lg">{user.first_name ?? ''} {user.last_name ?? ''}</span>
+                      <span className="text-lg">{client?.firstName ?? ''} {client?.user.lastName ?? ''}</span>
                       <p className="text-muted-foreground">
                         {t("dashboard_date")}: <span className="text-black">
-                          {session_date}
+                          {sessionDate.toISOString()}
                         </span>
                       </p>
                       <p className="text-muted-foreground">
                         {t("dashboard_duration_minute")}: <span className="text-black">
-                          {duration_minutes} {t("dashboard_minute")}
+                          {durationMinutes} {t("dashboard_minute")}
                         </span>
                       </p>
                       <p className="text-muted-foreground">
                         {t("dashboard_amount_paid")}: <span className="text-black">
-                          {amount_paid} {t("dashboard_earnings_amount")}
+                          {amountPaid} {t("dashboard_earnings_amount")}
                         </span>
                       </p>
                     </div>
@@ -106,7 +105,7 @@ const Dashboard = () => {
                 collapsible
                 className="max-w-lg my-4 w-full"
               >
-                {bookings.map(({ client: { user }, session_date, amount_paid, duration_minutes }, index) => (
+                {bookings.map(({ client, sessionDate, amountPaid, durationMinutes }, index) => (
                   <AccordionItem
                     key={index}
                     value={`item-${index}`}
@@ -115,23 +114,23 @@ const Dashboard = () => {
                     <AccordionTrigger
                       className="data-[state=open]:font-medium text-lg"
                     >
-                      {user.first_name ?? ''} {user.last_name ?? ''}
+                      {client?.user.firstName ?? ''} {client?.user.lastName ?? ''}
                     </AccordionTrigger>
                     <AccordionContent className="pl-8 flex flex-col gap-3 text-md">
                       <div className="flex flex-col gap-1 text-[15px]">
                         <p className="text-muted-foreground">
                           {t("dashboard_date")}: <span className="text-black">
-                            {session_date}
+                            {sessionDate.toISOString()}
                           </span>
                         </p>
                         <p className="text-muted-foreground">
                           {t("dashboard_duration_minute")}: <span className="text-black">
-                            {duration_minutes} {t("dashboard_minute")}
+                            {durationMinutes} {t("dashboard_minute")}
                           </span>
                         </p>
                         <p className="text-muted-foreground">
                           {t("dashboard_amount_paid")}: <span className="text-black">
-                            {amount_paid} {t("dashboard_earnings_amount")}
+                            {amountPaid} {t("dashboard_earnings_amount")}
                           </span>
                         </p>
                       </div>

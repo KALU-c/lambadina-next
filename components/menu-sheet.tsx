@@ -16,7 +16,7 @@ import Link from "next/link"
 
 const MenuSheet = () => {
   const { t } = useTranslation();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
 
   return (
     <div>
@@ -41,12 +41,14 @@ const MenuSheet = () => {
                   </Button>
                 </Link>
 
-                <Link href={"/dashboard"}>
-                  <Button variant={'secondary'} className="justify-start items-center py-4 w-full">
-                    <LayoutDashboardIcon className="mr-2" />
-                    {t('dashboard')}
-                  </Button>
-                </Link>
+                {user?.user_type === "mentor" && (
+                  <Link href={"/dashboard"}>
+                    <Button variant={'secondary'} className="justify-start items-center py-4 w-full">
+                      <LayoutDashboardIcon className="mr-2" />
+                      {t('dashboard')}
+                    </Button>
+                  </Link>
+                )}
               </>
             )}
             <Button variant={'secondary'} className="justify-start items-center py-4" disabled>
