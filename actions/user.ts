@@ -6,7 +6,7 @@ import { registerSchema } from "@/schema/registerSchema";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 
-const verifyToken = (token: string) => {
+export const verifyToken = (token: string) => {
 	return jwt.verify(token, process.env.JWT_SECRET_KEY as string) as { userId: number, iat: number, exp: number };
 }
 

@@ -22,7 +22,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
-import type { MentorProfile } from "@/types/mentor";
+// import type { MentorProfile } from "@/types/mentor";
 import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
 import { AvatarUpload } from "./UploadImage";
@@ -31,6 +31,8 @@ import { fetchUser, updateUser } from "@/actions/user";
 import { useRouter } from "next/navigation";
 import { CldImage, CldUploadButton } from 'next-cloudinary';
 import ProfilePicture from "./ProfilePicture";
+import { getMentor, getMentors } from "@/actions/mentors";
+import { MentorProfile } from "@/types/mentors";
 
 // type UpdateMentorProfile = {
 //   user: {
@@ -44,7 +46,7 @@ import ProfilePicture from "./ProfilePicture";
 //   };
 //   bio: string;
 //   categories: number[];
-//   price_per_minute: string;
+//   pricePerMinute: string;
 //   is_available: boolean;
 // };
 
@@ -57,7 +59,7 @@ const clientProfileSchema = z.object({
 
 // const mentorProfileSchema = clientProfileSchema.extend({
 //   bio: z.string().min(10),
-//   price_per_minute: z.string().min(1),
+//   pricePerMinute: z.string().min(1),
 //   is_available: z.boolean(),
 // });
 
@@ -78,7 +80,7 @@ const mentorProfileSchema = z.object({
   bio: z.string().min(10, {
     message: i18n.t("zod_bio_min"),
   }),
-  price_per_minute: z.string().min(1, {
+  pricePerMinute: z.string().min(1, {
     message: i18n.t("zod_bio_min"),
   }),
   is_available: z.boolean(),
@@ -110,7 +112,7 @@ const Profile = () => {
         phoneNumber: "",
         email: "",
         bio: "",
-        price_per_minute: "",
+        pricePerMinute: "",
         is_available: true
       }
       : {
@@ -127,9 +129,9 @@ const Profile = () => {
       setIsLoading(true);
       try {
         if (user?.user_type === "mentor") {
-          const allMentorsResponse: { data: MentorProfile[] } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors`);
+          const { mentors: allMentorsResponse } = await getMentors();
 
-          const currentMentor: MentorProfile | undefined = allMentorsResponse.data.find(mentor => mentor.user.id === user?.id);
+          const currentMentor: MentorProfile | undefined = allMentorsResponse.find(mentor => mentor.user.id === user?.id);
 
           const mentorResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/${currentMentor?.id}`, {
             headers: {
@@ -138,18 +140,24 @@ const Profile = () => {
             }
           });
 
+          // const { mentor: mentorData } = await getMentor(currentMentor?.id.toString() ?? '');
+
+          // if(!mentorData) {
+          //   router.replace("/login");
+          // }
+
           const mentorData: MentorProfile = mentorResponse.data;
 
-          setProfileURL(mentorData.user.profile_picture);
+          setProfileURL(mentorData.user.profilePicture ?? '');
 
           form.reset({
-            fullName: `${mentorData.user.first_name || ''} ${mentorData.user.last_name || ''}`,
+            fullName: `${mentorData.user.firstName || ''} ${mentorData.user.lastName || ''}`,
             username: mentorData.user.username,
-            phoneNumber: mentorData.user.phone_number || '',
-            email: mentorData.user.email,
+            phoneNumber: mentorData.user.phoneNumber || '',
+            email: mentorData.user.email ?? '',
             bio: mentorData.bio ?? '',
-            price_per_minute: mentorData.price_per_minute ?? '',
-            is_available: mentorData.is_available ?? true,
+            pricePerMinute: mentorData.pricePerMinute.toString() ?? '',
+            is_available: mentorData.isAvailable ?? true,
           })
         } else {
           if (!accessToken) {
@@ -205,7 +213,7 @@ const Profile = () => {
         formData.append("user[phoneNumber]", mentorValue.phoneNumber);
         formData.append("user[userType]", user.user_type);
         formData.append("bio", mentorValue.bio);
-        formData.append("pricePerMinute", mentorValue.price_per_minute);
+        formData.append("pricePerMinute", mentorValue.pricePerMinute);
         formData.append("isAvailable", String(mentorValue.is_available));
         // formData.append("categories", JSON.stringify([])); // TODO: replace with actual categories
 
@@ -422,7 +430,7 @@ const Profile = () => {
                 <div className="flex flex-col space-y-4">
                   <FormField
                     control={form.control}
-                    name="price_per_minute"
+                    name="pricePerMinute"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Price Per Minute</FormLabel>

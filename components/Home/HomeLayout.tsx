@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next"
 import { getMentors } from "@/actions/mentors"
 import { Category, MentorProfile } from "@/types/mentors"
 import { toast } from "sonner"
+import { getCategories } from "@/actions/category"
 
 const HomeLayout = () => {
   const { t } = useTranslation();
@@ -35,13 +36,10 @@ const HomeLayout = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [{ mentors: mentorsData }, categoriesRes] = await Promise.all([
+        const [{ mentors: mentorsData }, { categories: categoriesData }] = await Promise.all([
           getMentors(),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/categories/`),
+          getCategories(),
         ])
-
-        // const mentorsData = await mentorsRes;
-        const categoriesData = await categoriesRes.json()
 
         if (mentorsData.length === 0) {
           toast.error("")
