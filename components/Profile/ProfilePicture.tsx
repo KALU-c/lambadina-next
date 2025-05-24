@@ -61,6 +61,9 @@ export default function ProfilePicture({ profileURL, setProfileURL, isEditing, i
 							uploadPreset="next_lambadina_profile_picture"
 							className="w-60 h-80 bg-zinc-200 rounded-xl flex items-center justify-center text-zinc-500"
 							onSuccess={handleUpload}
+							onQueuesEnd={(result, { widget }) => {
+								widget.close();
+							}}
 						>
 							Upload Profile Picture
 						</CldUploadButton>

@@ -10,8 +10,10 @@ import { useRouter } from "next/navigation";
 import { fetchUser, loginUser, registerUser } from "@/actions/user";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserType | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [user, setUser] = useState<UserType | null>(
+    () => JSON.parse(localStorage.getItem('user') ?? "") as UserType || null
+  );
+  const [accessToken, setAccessToken] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
   const router = useRouter();

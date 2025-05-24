@@ -76,6 +76,8 @@ export const fetchUser = async (token: string) => {
 			return { user: null, message: "User id not fount" }
 		}
 
+		console.log(decoded)
+
 		const user = await prisma.user.findUnique({
 			where: { id: decoded.userId },
 			select: {
@@ -90,6 +92,8 @@ export const fetchUser = async (token: string) => {
 				isVerified: true
 			}
 		});
+
+		console.log(user)
 
 		if (!user) {
 			return { user: null, message: "User not found." }
@@ -139,6 +143,8 @@ export const updateUser = async (token: string, userData: FormData) => {
 				isVerified: true
 			}
 		});
+
+		console.log(user)
 
 		if (!user) {
 			return { user: null, message: "User not found." }
