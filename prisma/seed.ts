@@ -67,7 +67,7 @@ async function main() {
 					],
 				},
 			},
-		});		
+		});
 
 		// Assign a category to mentor using actual category IDs
 		await prisma.mentorCategory.create({
@@ -131,7 +131,7 @@ async function main() {
 				endTime: new Date(new Date().getTime() + 30 * 60000),
 				durationMinutes: 30,
 				callType: "video",
-				status: "completed",
+				status: "COMPLETED",
 				amountPaid: 20,
 				platformFee: 2,
 				mentorPayout: 18,
