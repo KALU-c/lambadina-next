@@ -49,7 +49,7 @@ export const getMentors = async () => {
 			}
 		});
 
-		console.log(mentors);
+		// console.log(mentors);
 		return { mentors, error: "" }
 	} catch (error) {
 		console.log(error);
