@@ -4,9 +4,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Suspense, useEffect, useState } from "react"
 import ExpertsCarouselSkeleton from "./experts-carousel-skeleton"
 // import { MENTORS } from "@/constants/mentors"
-import type { MentorProfile } from "@/types/mentor"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
+import { getMentors } from "@/actions/mentors"
+import { MentorProfile } from "@/types/mentors"
 
 const ExpertsCarousel = () => {
   const { t } = useTranslation();
@@ -17,11 +18,10 @@ const ExpertsCarousel = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [mentorsRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/`),
+        const [{ mentors: mentorsData }] = await Promise.all([
+          getMentors()
         ])
 
-        const mentorsData = await mentorsRes.json()
 
         setMentors(mentorsData)
       } catch {
@@ -52,7 +52,7 @@ const ExpertsCarousel = () => {
   }
 
   const topRatedMentors = [...mentors]
-    .sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating))
+    .sort((a, b) => b.rating - a.rating)
     .slice(0, 4);
 
   return (
@@ -72,11 +72,11 @@ const ExpertsCarousel = () => {
                 >
                   <Avatar className="h-[96px] w-[96px]">
                     <AvatarImage
-                      src={mentor.user.profile_picture}
-                      alt={`${mentor.user.first_name} ${mentor.user.last_name}`}
+                      src={mentor.user.profilePicture ?? ''}
+                      alt={`${mentor.user.firstName ?? ""} ${mentor.user.lastName ?? ""}`}
                     />
                     <AvatarFallback>
-                      {mentor.user.first_name.charAt(0)}{mentor.user.last_name.charAt(0)}
+                      {(mentor.user.firstName ?? "").charAt(0)}{(mentor.user.lastName ?? "").charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                 </Link>

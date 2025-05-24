@@ -37,7 +37,6 @@ const HomeLayout = () => {
       try {
         const [{ mentors: mentorsData }, categoriesRes] = await Promise.all([
           getMentors(),
-          // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/categories/`),
         ])
 

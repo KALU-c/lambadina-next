@@ -55,3 +55,24 @@ export const getMentors = async () => {
 		return { mentors: [], error: "Error fetching mentors" }
 	}
 }
+
+export const getMentor = async (id: string) => {
+	try {
+		const mentor = await prisma.mentor.findUnique({
+			where: { id: parseInt(id) },
+			include: {
+				user: {
+					select: {
+						firstName: true,
+						lastName: true,
+						profilePicture: true,
+					}
+				}
+			}
+		});
+		return { mentor, error: "" };
+	} catch (error) {
+		console.error(error);
+		return { mentor: null, error: "Error fetching mentor detail" };
+	}
+};

@@ -8,10 +8,16 @@ import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
 import Link from "next/link"
 import { MentorProfile } from "@/types/mentors"
+import { Mentor, User } from "@prisma/client"
+
+// Extend Mentor with the included user relation fields
+type MentorWithUser = Mentor & {
+  user: Pick<User, "firstName" | "lastName" | "profilePicture">;
+};
 
 type PricingProps = {
   ref: React.RefObject<null | HTMLDivElement>
-  mentor: MentorProfile
+  mentor: MentorWithUser
 }
 
 const Pricing = ({ ref, mentor }: PricingProps) => {

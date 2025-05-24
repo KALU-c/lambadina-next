@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import DetailsNavbar from "./layout/navbar";
 import { Star } from "lucide-react";
@@ -11,31 +11,34 @@ import CTA from "../Home/CTA";
 import FAQ from "./FAQ-accordion";
 import Footer from "../Footer";
 import { useEffect, useRef, useState } from "react";
-// import type { MentorProfile } from "@/types/mentor";
-import axios from "axios";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
-import { Mentor } from "@prisma/client";
-import { MentorProfile } from "@/types/mentors";
+import { getMentor } from "@/actions/mentors";
+import type { Mentor, User } from "@prisma/client";
 
 type DetailsParams = {
-  mentorId: string
-}
+  mentorId: string;
+};
+
+// Extend Mentor with the included user relation fields
+type MentorWithUser = Mentor & {
+  user: Pick<User, "firstName" | "lastName" | "profilePicture">;
+};
 
 const Details = ({ mentorId }: DetailsParams) => {
   const { t } = useTranslation();
 
-  const [mentor, setMentor] = useState<MentorProfile | null>(null);
+  const [mentor, setMentor] = useState<MentorWithUser | null>(null);
   const [loading, setLoading] = useState(true);
   const pricingRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchMentor = async () => {
       try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/${mentorId}/`);
+        const { mentor: data } = await getMentor(mentorId);
         setMentor(data);
-      } catch {
-        console.error("Error fetching mentor");
+      } catch (error) {
+        console.error("Error fetching mentor", error);
         setMentor(null);
       } finally {
         setLoading(false);
@@ -70,13 +73,13 @@ const Details = ({ mentorId }: DetailsParams) => {
           <Link href={"/"}>{t("details_breadcrumb_home")}</Link>
           /
           <span className="text-muted-foreground">
-            {mentor.user.firstName ?? ''} {mentor.user.lastName ?? ''}
+            {mentor.user.firstName ?? ""} {mentor.user.lastName ?? ""}
           </span>
         </div>
 
         <Profile
-          src={mentor.user.profilePicture ?? "/"}
-          name={`${mentor.user.firstName ?? ''} ${mentor.user.lastName ?? ''}`}
+          src={mentor.user.profilePicture ?? "/default-profile.png"}
+          name={`${mentor.user.firstName ?? ""} ${mentor.user.lastName ?? ""}`}
         />
         <Separator />
 
@@ -85,7 +88,7 @@ const Details = ({ mentorId }: DetailsParams) => {
             <div className="flex flex-col gap-0">
               <p className="text-muted-foreground text-lg">{t("details_starting_from")}</p>
               <p className="text-xl font-medium">
-                {mentor.pricePerMinute ?? ''} {t("details_currency")}
+                {mentor.pricePerMinute ?? ""} {t("details_currency")}
               </p>
             </div>
             <Button
@@ -107,17 +110,10 @@ const Details = ({ mentorId }: DetailsParams) => {
                 key={i}
                 size={16}
                 color="#FFB000"
-                fill={
-                  i < Math.floor(parseFloat(mentor.rating))
-                    ? "#FFB000"
-                    : "none"
-                }
+                fill={i < Math.floor(mentor.rating) ? "#FFB000" : "none"}
               />
             ))}
-            <p className="ml-2 text-[#FFB000]">
-              {mentor.rating}
-              {/* <span className="text-muted-foreground"> (27)</span> */}
-            </p>
+            <p className="ml-2 text-[#FFB000]">{mentor.rating}</p>
           </div>
         </div>
 
