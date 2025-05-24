@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
 import Link from "next/link"
 import { MentorProfile } from "@/types/mentors"
-import { Mentor, User } from "@prisma/client"
+import { Mentor, User } from "@/generated/prisma"
 
 // Extend Mentor with the included user relation fields
 type MentorWithUser = Mentor & {
