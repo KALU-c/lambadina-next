@@ -13,6 +13,8 @@ const DetailsNavbar = () => {
             src="/logo.png"
             alt="lambadina logo"
             className="h-6"
+            height={24}
+            width={40}
           />
         </div>
       </Link>

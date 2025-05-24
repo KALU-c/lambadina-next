@@ -18,6 +18,8 @@ const Profile = ({ name, src }: ProfileProps) => {
           src={src}
           className="w-full h-[407px] object-cover rounded-[8px]"
           alt=""
+          width={407}
+          height={407}
         />
         {/* <Heart
           className="absolute right-3 top-3"

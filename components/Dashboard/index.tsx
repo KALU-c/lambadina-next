@@ -152,7 +152,7 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="py-16 flex flex-col items-center justify-center gap-8">
-            <Image src="/empty-state/empty-booking.png" alt="" />
+            <Image src="/empty-state/empty-booking.png" alt="" width={50} height={50} />
             <div className="flex flex-col items-center gap-0 text-muted-foreground">
               <p className="text-xl font-medium">{t("no_bookings")}</p>
               <span className="font-light">{t("no_data_to_show")}</span>

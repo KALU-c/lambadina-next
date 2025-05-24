@@ -10,6 +10,8 @@ const Navbar = () => {
           src="/logo.png"
           alt="lambadina logo"
           className="h-7"
+          width={50}
+          height={20}
         />
       </Link>
 

@@ -29,6 +29,8 @@ const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
               src={user.profilePicture ?? ''}
               className="w-[210px] h-[240px] object-cover rounded-[8px]"
               alt="card"
+              width={210}
+              height={240}
             />
           </Link>
           {/* <Heart

@@ -18,6 +18,8 @@ const CtaCard = ({
         src={src}
         className="h-[68px] w-[68px]"
         alt="cta"
+        width={40}
+        height={68}
       />
 
       <div className="flex flex-col gap-2 px-12">
