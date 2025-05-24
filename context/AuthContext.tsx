@@ -7,6 +7,7 @@ import { z } from "zod";
 import { registerSchema } from "@/schema/registerSchema";
 import { AuthContext, type UserType } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { loginUser, registerUser } from "@/actions/user";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserType | null>(null);
@@ -51,31 +52,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const register = async (values: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/register/`,
-        values
-      );
+      const { user, error } = await registerUser(values);
 
-      // After successful registration, log the user in
-      const loginRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/login/`,
-        {
-          username: values.username,
-          password: values.password,
-        }
-      );
+      if (error) {
+        toast.error(error);
+        return;
+      }
 
-      const { access, refresh } = loginRes.data;
+      if (!user) {
+        toast.error("Something went wrong. Please try again.");
+        return;
+      }
 
-      // Fetch the user profile after successful login
-      await fetchUserProfile(access);
-
-      setAccessToken(access);
-      localStorage.setItem("accessToken", access);
-      localStorage.setItem("refreshToken", refresh);
-
-      toast.success("Account created and logged in successfully 🎉");
-      router.replace("/profile");
+      await login(values.username, values.password);
     } catch (err) {
       console.error(err);
       if (err instanceof AxiosError) {
@@ -91,22 +80,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (username: string, password: string) => {
     setIsLoading(true);
     try {
-      const loginRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/login/`,
-        {
-          username,
-          password,
-        }
-      );
+      const { token, message } = await loginUser(username, password);
 
-      const { access, refresh } = loginRes.data;
+      if (!token) {
+        toast.error(message);
+        return;
+      }
 
       // Fetch the user profile after successful login
-      await fetchUserProfile(access);
+      await fetchUserProfile(token);
 
-      setAccessToken(access);
-      localStorage.setItem("accessToken", access);
-      localStorage.setItem("refreshToken", refresh);
+      setAccessToken(token);
+      localStorage.setItem("accessToken", token);
+      // localStorage.setItem("refreshToken", refresh);
 
       toast.success("Logged in successfully 🎉");
       router.replace("/");

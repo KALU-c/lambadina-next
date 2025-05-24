@@ -21,7 +21,7 @@ const MenuSheet = () => {
   return (
     <div>
       <Sheet>
-        <SheetTrigger>
+        <SheetTrigger asChild>
           <Menu size={28} strokeWidth={2} />
         </SheetTrigger>
         <SheetContent>

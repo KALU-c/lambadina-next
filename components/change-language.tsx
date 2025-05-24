@@ -36,7 +36,7 @@ export default function ChangeLanguage() {
       defaultValue={currentLanguage}
       onValueChange={handleLanguageChange}
     >
-      <SelectTrigger className="border-none hover:bg-accent shadow-none w-full p-0">
+      <SelectTrigger className="border-none hover:bg-accent shadow-none w-full p-0" asChild>
         <Button variant={'secondary'} className="w-full justify-start">
           <Languages />
           {t("change_language")}
