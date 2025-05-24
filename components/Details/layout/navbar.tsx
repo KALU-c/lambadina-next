@@ -1,6 +1,7 @@
 import { ChevronLeft } from "lucide-react"
 import MenuSheet from "@/components/menu-sheet"
 import Link from "next/link"
+import Image from "next/image"
 
 const DetailsNavbar = () => {
   return (
@@ -8,7 +9,7 @@ const DetailsNavbar = () => {
       <Link href={"/"}>
         <div className="flex flex-row gap-1 items-center">
           <ChevronLeft size={28} strokeWidth={3} />
-          <img
+          <Image
             src="/logo.png"
             alt="lambadina logo"
             className="h-6"

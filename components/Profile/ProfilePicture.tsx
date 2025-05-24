@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CldImage, CldUploadButton } from "next-cloudinary";
+import { CldImage, CldUploadButton, CloudinaryUploadWidgetResults } from "next-cloudinary";
 import { cn } from "@/lib/utils";
 
 interface ProfilePictureProps {
@@ -13,11 +13,14 @@ interface ProfilePictureProps {
 
 export default function ProfilePicture({ profileURL, setProfileURL, isEditing, isLoading }: ProfilePictureProps) {
 
-	const handleUpload = (result: any) => {
+	const handleUpload = (result: CloudinaryUploadWidgetResults) => {
 		console.log("Upload Result:", result);
-		const uploadedUrl = result.info.secure_url;
-		setProfileURL(uploadedUrl);
-		// onUpload(uploadedUrl); // let parent component know
+
+		if (result.info && typeof result.info !== "string") {
+			const uploadedUrl = result.info.secure_url;
+			setProfileURL(uploadedUrl);
+			// onUpload(uploadedUrl);
+		}
 	};
 
 	return (
@@ -50,7 +53,7 @@ export default function ProfilePicture({ profileURL, setProfileURL, isEditing, i
 				<>
 					{(!isEditing || isLoading) ? (
 						<div className="w-60 h-80 bg-zinc-200 rounded-xl flex items-center justify-center text-zinc-500 px-2 text-center">
-							Click the 'Update Profile' button below to make changes to your profile.
+							Click the &apos;Update&apos; Profile button below to make changes to your profile.
 						</div>
 					) : (
 

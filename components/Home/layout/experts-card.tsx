@@ -7,6 +7,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { MentorProfile } from "@/types/mentors"
+import Image from "next/image"
 
 const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
   // const [liked, setLiked] = useState(false);
@@ -24,9 +25,10 @@ const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
         <div className="relative w-[210px] min-h-[240px]">
           <Link href={`/mentors/${id}`}>
             {/* TODO - add fallback image */}
-            <img
+            <Image
               src={user.profilePicture ?? ''}
               className="w-[210px] h-[240px] object-cover rounded-[8px]"
+              alt="card"
             />
           </Link>
           {/* <Heart

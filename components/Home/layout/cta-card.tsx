@@ -1,4 +1,5 @@
 import i18next from "i18next"
+import Image from "next/image"
 
 export type CtaCardProps = {
   src: string
@@ -13,9 +14,10 @@ const CtaCard = ({
 }: CtaCardProps) => {
   return (
     <div className="h-[360px] w-full min-w-[330px] bg-zinc-100 flex flex-col items-center justify-center rounded-[8px] gap-4">
-      <img
+      <Image
         src={src}
         className="h-[68px] w-[68px]"
+        alt="cta"
       />
 
       <div className="flex flex-col gap-2 px-12">

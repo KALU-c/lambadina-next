@@ -21,6 +21,7 @@ import { Loader } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
+import Image from "next/image";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -46,7 +47,7 @@ const Login = () => {
 
         <Card>
           <CardHeader className="flex flex-col gap-8 items-center justify-center">
-            <img src="/logo.png" alt="lambadina logo" className="h-8 text-center" />
+            <Image src="/logo.png" alt="lambadina logo" className="h-8 text-center" />
 
             <div className="flex flex-col">
               <p className="text-center text-2xl">{t("login_welcome_back")}</p>

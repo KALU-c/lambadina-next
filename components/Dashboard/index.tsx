@@ -12,6 +12,7 @@ import axios from "axios"
 import type { Booking } from "@/types/booking"
 import { toast } from "sonner"
 import Link from "next/link"
+import Image from "next/image"
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -151,7 +152,7 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="py-16 flex flex-col items-center justify-center gap-8">
-            <img src="/empty-state/empty-booking.png" alt="" />
+            <Image src="/empty-state/empty-booking.png" alt="" />
             <div className="flex flex-col items-center gap-0 text-muted-foreground">
               <p className="text-xl font-medium">{t("no_bookings")}</p>
               <span className="font-light">{t("no_data_to_show")}</span>

@@ -194,7 +194,7 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, [form, user?.id, user?.user_type, accessToken]);
+  }, [form, user?.id, user?.user_type, accessToken, router]);
 
   const onSubmit = async (values: CombinedProfileSchemaType) => {
     const mentorValue = values as MentorProfileSchemaType
