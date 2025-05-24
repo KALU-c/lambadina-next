@@ -184,7 +184,6 @@ const Profile = () => {
   }, [form, user?.id, user?.user_type, accessToken]);
 
   const onSubmit = async (values: CombinedProfileSchemaType) => {
-    console.log("Submitting form with values:", values);
     const mentorValue = values as MentorProfileSchemaType
     setIsLoading(true);
 

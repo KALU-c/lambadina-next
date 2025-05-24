@@ -29,8 +29,6 @@ const Dashboard = () => {
           }
         });
 
-        console.log(response.data)
-
         if (response.data) {
           const filterBooked = response.data.filter((bookings: Booking) => bookings.status === 'confirmed');
           const filterPending = response.data.filter((bookings: Booking) => bookings.status === 'pending');

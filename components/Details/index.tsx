@@ -31,7 +31,6 @@ const Details = ({ mentorId }: DetailsParams) => {
     const fetchMentor = async () => {
       try {
         const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/${mentorId}/`);
-        // console.log("Fetched Mentor:", data);
         setMentor(data);
       } catch {
         console.error("Error fetching mentor");
