@@ -9,7 +9,7 @@ generator client {
   output        = "./generated/client"
   // output   = "../node_modules/.prisma/client"
   engineType    = "binary" // -> vercel :/
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  binaryTargets = ["rhel-openssl-3.0.x"]
 }
 
 datasource db {
