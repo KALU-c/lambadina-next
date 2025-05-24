@@ -27,8 +27,10 @@ import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
 import { AvatarUpload } from "./UploadImage";
 import Link from "next/link";
-import { fetchUser } from "@/actions/user";
+import { fetchUser, updateUser } from "@/actions/user";
 import { useRouter } from "next/navigation";
+import { CldImage, CldUploadButton } from 'next-cloudinary';
+import ProfilePicture from "./ProfilePicture";
 
 // type UpdateMentorProfile = {
 //   user: {
@@ -51,7 +53,6 @@ const clientProfileSchema = z.object({
   username: z.string().min(2),
   phoneNumber: z.string().min(10),
   email: z.string().email(),
-  profile_picture: z.union([z.instanceof(File), z.string().max(0)]).optional(),
 });
 
 // const mentorProfileSchema = clientProfileSchema.extend({
@@ -81,9 +82,6 @@ const mentorProfileSchema = z.object({
     message: i18n.t("zod_bio_min"),
   }),
   is_available: z.boolean(),
-  profile_picture: z
-    .union([z.instanceof(File), z.string().max(0)])
-    .optional(),
 });
 
 type ClientProfileSchemaType = z.infer<typeof clientProfileSchema>
@@ -99,8 +97,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-
+  const [profileURL, setProfileURL] = useState("");
 
   const form = useForm<CombinedProfileSchemaType>({
     resolver: zodResolver(
@@ -114,15 +111,13 @@ const Profile = () => {
         email: "",
         bio: "",
         price_per_minute: "",
-        is_available: true,
-        profile_picture: ""
+        is_available: true
       }
       : {
         fullName: "",
         username: user?.username,
         phoneNumber: "",
-        email: "",
-        profile_picture: ""
+        email: ""
       }
   });
 
@@ -145,6 +140,8 @@ const Profile = () => {
 
           const mentorData: MentorProfile = mentorResponse.data;
 
+          setProfileURL(mentorData.user.profile_picture);
+
           form.reset({
             fullName: `${mentorData.user.first_name || ''} ${mentorData.user.last_name || ''}`,
             username: mentorData.user.username,
@@ -153,7 +150,6 @@ const Profile = () => {
             bio: mentorData.bio ?? '',
             price_per_minute: mentorData.price_per_minute ?? '',
             is_available: mentorData.is_available ?? true,
-            profile_picture: mentorData.user.profile_picture
           })
         } else {
           if (!accessToken) {
@@ -168,6 +164,8 @@ const Profile = () => {
           }
 
           // const data = response.data;
+
+          setProfileURL(user.profile_picture ?? '');
 
           form.reset({
             fullName: `${user.first_name || ''} ${user.last_name || ''}`,
@@ -200,19 +198,19 @@ const Profile = () => {
       if (user?.user_type === "mentor") {
         const [first_name, last_name] = mentorValue.fullName.split(" ");
 
-        formData.append("user[first_name]", first_name);
-        formData.append("user[last_name]", last_name);
+        formData.append("user[firstName]", first_name);
+        formData.append("user[lastName]", last_name);
         formData.append("user[username]", mentorValue.username);
         formData.append("user[email]", mentorValue.email);
-        formData.append("user[phone_number]", mentorValue.phoneNumber);
-        formData.append("user[user_type]", user.user_type);
+        formData.append("user[phoneNumber]", mentorValue.phoneNumber);
+        formData.append("user[userType]", user.user_type);
         formData.append("bio", mentorValue.bio);
-        formData.append("price_per_minute", mentorValue.price_per_minute);
-        formData.append("is_available", String(mentorValue.is_available));
+        formData.append("pricePerMinute", mentorValue.price_per_minute);
+        formData.append("isAvailable", String(mentorValue.is_available));
         // formData.append("categories", JSON.stringify([])); // TODO: replace with actual categories
 
-        if (mentorValue.profile_picture) {
-          formData.append("user[profile_picture]", mentorValue.profile_picture);
+        if (profileURL) {
+          formData.append("user[profilePicture]", profileURL);
         }
 
         const response = await axios.patch(
@@ -236,31 +234,31 @@ const Profile = () => {
       } else {
         const [first_name, last_name] = values.fullName.split(" ");
 
-        formData.append("first_name", first_name);
-        formData.append("last_name", last_name);
+        formData.append("firstName", first_name);
+        formData.append("lastName", last_name);
         formData.append("username", values.username);
         formData.append("email", values.email);
-        formData.append("phone_number", values.phoneNumber);
-        formData.append("user_type", user?.user_type ?? "");
+        formData.append("phoneNumber", values.phoneNumber);
+        formData.append("userType", user?.user_type ?? "");
 
-        if (values.profile_picture) {
-          formData.append("profile_picture", values.profile_picture);
+        if (profileURL) {
+          formData.append("profilePicture", profileURL);
         }
 
-        const response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        if (!accessToken) {
+          return router.push('/login');
+        }
 
-        if (response.status === 200) {
+        const { user: updatedUser, error } = await updateUser(accessToken, formData);
+
+        if (!updatedUser) {
+          toast.error(error);
+          return;
+        }
+
+        if (updatedUser) {
           toast.success("Profile updated successfully!");
-          localStorage.setItem("user", JSON.stringify(response.data));
+          localStorage.setItem("user", JSON.stringify(updatedUser));
           setIsEditing(false);
         } else {
           toast.error("Failed to update profile.");
@@ -294,6 +292,45 @@ const Profile = () => {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Profile Picture and Bio */}
+            <div className="pt-4">
+              <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
+                <User2 size={18} />
+                {t("profile_picture_and_bio")}
+              </div>
+
+              <div className="flex flex-col space-y-4">
+
+                <ProfilePicture
+                  isEditing={isEditing}
+                  isLoading={isLoading}
+                  profileURL={profileURL}
+                  setProfileURL={setProfileURL}
+                />
+
+                {user?.user_type === "mentor" && (
+                  <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("bio")}</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="bg-zinc-100 h-52"
+                            disabled={!isEditing || isLoading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
+
+
             {/* Personal Information */}
             <div className="pt-4">
               <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
@@ -420,50 +457,6 @@ const Profile = () => {
                 </div>
               </div>
             )}
-
-
-            {/* Profile Picture and Bio */}
-            <div className="pt-4">
-              <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
-                <User2 size={18} />
-                {t("profile_picture_and_bio")}
-              </div>
-
-              <div className="flex flex-col space-y-4">
-                <FormField
-                  control={form.control}
-                  name="profile_picture"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <AvatarUpload value={field.value} onChange={field.onChange} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {user?.user_type === "mentor" && (
-                  <FormField
-                    control={form.control}
-                    name="bio"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("bio")}</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            className="bg-zinc-100 h-52"
-                            disabled={!isEditing || isLoading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-              </div>
-            </div>
 
             {/* Security */}
             <div className="pt-4">

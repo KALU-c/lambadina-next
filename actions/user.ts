@@ -113,3 +113,52 @@ export const fetchUser = async (token: string) => {
 		return { user: null, message: "Error fetching user profile" }
 	}
 }
+
+export const updateUser = async (token: string, userData: FormData) => {
+	try {
+		const decoded = verifyToken(token);
+
+		// Convert FormData to plain object
+		const data: any = {};
+		userData.forEach((value, key) => {
+			data[key] = value;
+		});
+
+		const user = await prisma.user.update({
+			where: { id: decoded.userId },
+			data: data,
+			select: {
+				id: true,
+				username: true,
+				email: true,
+				firstName: true,
+				lastName: true,
+				phoneNumber: true,
+				userType: true,
+				profilePicture: true,
+				isVerified: true
+			}
+		});
+
+		if (!user) {
+			return { user: null, message: "User not found." }
+		}
+
+		const updatedUserData = {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			first_name: user.firstName,
+			last_name: user.lastName,
+			phone_number: user.phoneNumber,
+			user_type: user.userType,
+			profile_picture: user.profilePicture,
+			is_verified: user.isVerified
+		}
+
+		return { user: updatedUserData, error: "" }
+	} catch (error) {
+		console.log(error);
+		return { user: null, error: "Failed to update profile." }
+	}
+}
