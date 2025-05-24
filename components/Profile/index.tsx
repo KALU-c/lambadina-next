@@ -131,7 +131,7 @@ const Profile = () => {
         if (user?.user_type === "mentor") {
           const { mentors: allMentorsResponse } = await getMentors();
 
-          const currentMentor: MentorProfile | undefined = allMentorsResponse.find(mentor => mentor.user.id === user?.id);
+          const currentMentor: MentorProfile | undefined = allMentorsResponse.find((mentor: MentorProfile) => mentor.user.id === user?.id);
 
           const mentorResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/${currentMentor?.id}`, {
             headers: {
