@@ -103,8 +103,8 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
           </p>
 
           <ul className="list-disc pl-8 py-2">
-            {pricing.benefits.map(benefit => (
-              <li>{benefit}</li>
+            {pricing.benefits.map((benefit, i) => (
+              <li key={i}>{benefit}</li>
             ))}
           </ul>
 
