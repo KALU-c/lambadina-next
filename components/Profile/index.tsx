@@ -27,6 +27,8 @@ import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
 import { AvatarUpload } from "./UploadImage";
 import Link from "next/link";
+import { fetchUser } from "@/actions/user";
+import { useRouter } from "next/navigation";
 
 // type UpdateMentorProfile = {
 //   user: {
@@ -91,6 +93,7 @@ type CombinedProfileSchemaType = MentorProfileSchemaType | ClientProfileSchemaTy
 
 const Profile = () => {
   const { t } = useTranslation()
+  const router = useRouter()
 
   const { user, accessToken } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -153,20 +156,24 @@ const Profile = () => {
             profile_picture: mentorData.user.profile_picture
           })
         } else {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/`, {
-            headers: {
-              "Authorization": `Bearer ${accessToken}`,
-              "Content-Type": "application/json"
-            }
-          });
+          if (!accessToken) {
+            return router.push('/login');
+          }
 
-          const data = response.data;
+          const { user, message } = await fetchUser(accessToken);
+
+          if (!user) {
+            toast.error(message);
+            return;
+          }
+
+          // const data = response.data;
 
           form.reset({
-            fullName: `${data.first_name || ''} ${data.last_name || ''}`,
-            username: data.username,
-            phoneNumber: data.phone_number || '',
-            email: data.email,
+            fullName: `${user.first_name || ''} ${user.last_name || ''}`,
+            username: user.username,
+            phoneNumber: user.phone_number || '',
+            email: user.email || '',
           });
         }
 

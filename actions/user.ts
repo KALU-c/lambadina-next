@@ -6,6 +6,10 @@ import { registerSchema } from "@/schema/registerSchema";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 
+const verifyToken = (token: string) => {
+	return jwt.verify(token, process.env.JWT_SECRET_KEY as string) as { userId: number, iat: number, exp: number };
+}
+
 export const registerUser = async (userData: z.infer<typeof registerSchema>) => {
 	const { password, username, email, user_type } = userData;
 
@@ -36,7 +40,6 @@ export const registerUser = async (userData: z.infer<typeof registerSchema>) => 
 	}
 }
 
-
 export const loginUser = async (username: string, passwordText: string) => {
 	try {
 		const user = await prisma.user.findUnique({
@@ -62,5 +65,51 @@ export const loginUser = async (username: string, passwordText: string) => {
 	} catch (error) {
 		console.error(error);
 		return { token: null, message: "Something went wrong. Please try again." }
+	}
+}
+
+export const fetchUser = async (token: string) => {
+	try {
+		const decoded = verifyToken(token);
+
+		if (!decoded.userId) {
+			return { user: null, message: "User id not fount" }
+		}
+
+		const user = await prisma.user.findUnique({
+			where: { id: decoded.userId },
+			select: {
+				id: true,
+				username: true,
+				email: true,
+				firstName: true,
+				lastName: true,
+				phoneNumber: true,
+				userType: true,
+				profilePicture: true,
+				isVerified: true
+			}
+		});
+
+		if (!user) {
+			return { user: null, message: "User not found." }
+		}
+
+		const userData = {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			first_name: user.firstName,
+			last_name: user.lastName,
+			phone_number: user.phoneNumber,
+			user_type: user.userType,
+			profile_picture: user.profilePicture,
+			is_verified: user.isVerified
+		}
+
+		return { user: userData, message: "" }
+	} catch (error) {
+		console.error(error);
+		return { user: null, message: "Error fetching user profile" }
 	}
 }

@@ -3,15 +3,16 @@
 import type { registerSchema } from "@/schema/registerSchema";
 import { createContext, useContext } from "react";
 import { z } from "zod";
+import { UserType as UserTypePrisma } from "@prisma/client";
 
 export interface UserType {
   id: number;
   username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-  user_type: "client" | "mentor";
+  email: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  phone_number: string | null;
+  user_type: UserTypePrisma;
   profile_picture: string | null;
   is_verified: boolean;
 }

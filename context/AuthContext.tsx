@@ -7,7 +7,7 @@ import { z } from "zod";
 import { registerSchema } from "@/schema/registerSchema";
 import { AuthContext, type UserType } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { loginUser, registerUser } from "@/actions/user";
+import { fetchUser, loginUser, registerUser } from "@/actions/user";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserType | null>(null);
@@ -33,16 +33,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUserProfile = async (token: string) => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { user, message } = await fetchUser(token);
 
-      const profileData: UserType = response.data;
-      // TODO - change this
-      setUser(profileData);
-      localStorage.setItem("user", JSON.stringify(profileData));
+      if (!user) {
+        toast.error(message);
+        return;
+      }
+
+      setUser(user);
+      // TODO - do not save user data to ls
+      localStorage.setItem("user", JSON.stringify(user));
     } catch {
       console.error("Error fetching user profile");
       toast.error("Failed to fetch user profile. Please try again.");
