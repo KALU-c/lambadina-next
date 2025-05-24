@@ -469,7 +469,7 @@ const Profile = () => {
                           name="basicPrice"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Basic Price ($/min)</FormLabel>
+                              <FormLabel>Basic Price (ETB/min)</FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
@@ -487,7 +487,7 @@ const Profile = () => {
                           name="standardPrice"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Standard Price ($/min)</FormLabel>
+                              <FormLabel>Standard Price (ETB/min)</FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
@@ -505,7 +505,7 @@ const Profile = () => {
                           name="premiumPrice"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Premium Price ($/min)</FormLabel>
+                              <FormLabel>Premium Price (ETB/min)</FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
