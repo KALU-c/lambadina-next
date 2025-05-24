@@ -88,7 +88,7 @@ export const getMentor = async (id: string, token?: string) => {
 
 export const updateMentor = async (token: string, formData: FormData) => {
 	try {
-		const decoded = verifyToken(token);
+		const decoded = await verifyToken(token);
 
 		// Parse formData into separate userData and mentorData objects
 		const userData: any = {};

@@ -6,7 +6,7 @@ import { registerSchema } from "@/schema/registerSchema";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 
-export const verifyToken = (token: string) => {
+export const verifyToken = async (token: string) => {
 	return jwt.verify(token, process.env.JWT_SECRET_KEY as string) as { userId: number, iat: number, exp: number };
 }
 
@@ -70,7 +70,7 @@ export const loginUser = async (username: string, passwordText: string) => {
 
 export const fetchUser = async (token: string) => {
 	try {
-		const decoded = verifyToken(token);
+		const decoded = await verifyToken(token);
 
 		if (!decoded.userId) {
 			return { user: null, message: "User id not fount" }
@@ -116,7 +116,7 @@ export const fetchUser = async (token: string) => {
 
 export const updateUser = async (token: string, userData: FormData) => {
 	try {
-		const decoded = verifyToken(token);
+		const decoded = await verifyToken(token);
 
 		// Convert FormData to plain object
 		const data: any = {};
