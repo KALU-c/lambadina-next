@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { getMentor } from "@/actions/mentors";
-import type { Mentor, User } from "@/generated/prisma";
+import type { Mentor, User } from "@prisma/client";
 
 type DetailsParams = {
   mentorId: string;

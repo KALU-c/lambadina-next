@@ -3,7 +3,7 @@
 import type { registerSchema } from "@/schema/registerSchema";
 import { createContext, useContext } from "react";
 import { z } from "zod";
-import { UserType as UserTypePrisma } from "@/generated/prisma";
+import { UserType as UserTypePrisma } from "@prisma/client";
 
 export interface UserType {
   id: number;

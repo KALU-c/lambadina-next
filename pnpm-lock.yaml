@@ -16,7 +16,7 @@ importers:
       "@icons-pack/react-simple-icons":
         specifier: ^12.8.0
         version: 12.8.0(react@19.1.0)
-      "@/generated/prisma":
+      "@prisma/client":
         specifier: ^6.8.2
         version: 6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)
       "@radix-ui/react-accordion":
@@ -950,7 +950,7 @@ packages:
       }
     engines: { node: ">=10" }
 
-  "@/generated/prisma@6.8.2":
+  "@prisma/client@6.8.2":
     resolution:
       {
         integrity: sha512-5II+vbyzv4si6Yunwgkj0qT/iY0zyspttoDrL3R4BYgLdp42/d2C8xdi9vqkrYtKt9H32oFIukvyw3Koz5JoDg==,
@@ -4874,7 +4874,7 @@ snapshots:
 
   "@phc/format@1.0.0": {}
 
-  "@/generated/prisma@6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)":
+  "@prisma/client@6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)":
     optionalDependencies:
       prisma: 6.8.2(typescript@5.8.3)
       typescript: 5.8.3
