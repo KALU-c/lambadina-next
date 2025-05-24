@@ -156,7 +156,7 @@ const Profile = () => {
             phoneNumber: mentorData.user.phoneNumber || '',
             email: mentorData.user.email ?? '',
             bio: mentorData.bio ?? '',
-            pricePerMinute: mentorData.pricePerMinute.toString() ?? '',
+            pricePerMinute: mentorData.pricing[0].price.toString() ?? '',
             is_available: mentorData.isAvailable ?? true,
           })
         } else {

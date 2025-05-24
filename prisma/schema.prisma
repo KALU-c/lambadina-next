@@ -88,31 +88,39 @@ model Category {
 }
 
 model Mentor {
-  id             Int      @id @default(autoincrement())
-  bio            String
-  pricePerMinute Float    @map("price_per_minute")
-  isAvailable    Boolean  @map("is_available")
-  rating         Float
-  totalSessions  Int      @map("total_sessions")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-  userId         Int      @unique @map("user_id")
+  id               Int              @id @default(autoincrement())
+  bio              String
+  isAvailable      Boolean          @map("is_available")
+  rating           Float
+  totalSessions    Int              @map("total_sessions")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  userId           Int              @unique @map("user_id")
 
-  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   mentorCategories MentorCategory[]
   availabilities   MentorAvailability[]
   booking          Booking[]
   categories       Category[]
+  pricing          MentorPricing[]
 }
 
-// enum PricingType {
-//   BASIC
-// }
+enum PricingType {
+  BASIC
+  STANDARD
+  PREMIUM
+}
 
-// model Pricing {
-//   id Int @id @default(autoincrement())
-//   type 
-// }
+model MentorPricing {
+  id         Int          @id @default(autoincrement())
+  type       PricingType
+  price      Float
+  mentorId   Int          @map("mentor_id")
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  mentor     Mentor       @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+}
+
 
 model MentorCategory {
   id         Int      @id @default(autoincrement())

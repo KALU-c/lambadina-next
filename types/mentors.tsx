@@ -28,16 +28,26 @@ export type Availability = {
 	mentorId: number;
 };
 
+export type MentorPricingType = "BASIC" | "STANDARD" | "PREMIUM"
+
+export type MentorPricing = {
+	id: number
+	type: MentorPricingType
+	price: number
+	mentorId?: number
+	createdAt: Date
+}
+
 export type MentorProfile = {
 	id: number;
 	user: User;
 	bio: string;
 	categories: Category[];
-	pricePerMinute: number;
 	isAvailable: boolean;
 	rating: number;
 	totalSessions: number;
 	availabilities: Availability[];
+	pricing: MentorPricing[];
 	createdAt: Date;
 	updatedAt: Date;
 };

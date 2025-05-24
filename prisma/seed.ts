@@ -44,15 +44,30 @@ async function main() {
 		const mentor = await prisma.mentor.create({
 			data: {
 				bio: faker.lorem.sentences(2),
-				pricePerMinute: parseFloat(faker.finance.amount({ min: 1, max: 5, dec: 2 })),
 				isAvailable: true,
 				rating: faker.number.float({ min: 4, max: 5 }),
 				totalSessions: faker.number.int({ min: 5, max: 50 }),
 				createdAt: new Date(),
 				updatedAt: new Date(),
 				userId: mentorUser.id,
+				pricing: {
+					create: [
+						{
+							type: "BASIC",
+							price: parseFloat(faker.finance.amount({ min: 1, max: 3, dec: 2 })),
+						},
+						{
+							type: "STANDARD",
+							price: parseFloat(faker.finance.amount({ min: 3, max: 5, dec: 2 })),
+						},
+						{
+							type: "PREMIUM",
+							price: parseFloat(faker.finance.amount({ min: 5, max: 10, dec: 2 })),
+						},
+					],
+				},
 			},
-		});
+		});		
 
 		// Assign a category to mentor using actual category IDs
 		await prisma.mentorCategory.create({

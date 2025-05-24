@@ -16,7 +16,7 @@ const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
     id,
     user,
     bio,
-    pricePerMinute
+    pricing
   } = mentor;
 
   return (
@@ -52,7 +52,7 @@ const ExpertsCard = ({ mentor }: { mentor: MentorProfile }) => {
               {user.firstName}{" "}{user.lastName}
               {user.isVerified && <BadgeCheck fill="#ffb102" color="#ffffff" size={20} />}
             </h2>
-            <p>ETB {pricePerMinute} • Session</p>
+            <p>ETB {pricing[0].price} • Session</p>
             <p className="mt-1 text-md text-muted-foreground line-clamp-3">
               {bio}
             </p>

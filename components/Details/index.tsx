@@ -86,7 +86,7 @@ const Details = ({ mentorId }: DetailsParams) => {
             <div className="flex flex-col gap-0">
               <p className="text-muted-foreground text-lg">{t("details_starting_from")}</p>
               <p className="text-xl font-medium">
-                {mentor.pricePerMinute ?? ""} {t("details_currency")}
+                {mentor.pricing[0].price.toFixed(2) ?? ""} {t("details_currency")}
               </p>
             </div>
             <Button
@@ -111,7 +111,7 @@ const Details = ({ mentorId }: DetailsParams) => {
                 fill={i < Math.floor(mentor.rating) ? "#FFB000" : "none"}
               />
             ))}
-            <p className="ml-2 text-[#FFB000]">{mentor.rating}</p>
+            <p className="ml-2 text-[#FFB000]">{mentor.rating.toFixed(1)}</p>
           </div>
         </div>
 

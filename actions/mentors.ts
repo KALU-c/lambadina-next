@@ -4,58 +4,65 @@ import prisma from "@/lib/prisma";
 import { verifyToken } from "./user";
 
 export const getMentors = async () => {
-	try {
-		const mentors = await prisma.mentor.findMany({
-			select: {
-				id: true,
-				user: {
-					select: {
-						id: true,
-						username: true,
-						email: true,
-						firstName: true,
-						lastName: true,
-						phoneNumber: true,
-						userType: true,
-						profilePicture: true,
-						isVerified: true
-					}
-				},
-				bio: true,
-				categories: {
-					select: {
-						id: true,
-						name: true,
-						description: true,
-						createdAt: true
-					}
-				},
-				pricePerMinute: true,
-				isAvailable: true,
-				rating: true,
-				totalSessions: true,
-				availabilities: {
-					select: {
-						id: true,
-						dayOfWeek: true,
-						startTime: true,
-						endTime: true,
-						isAvailable: true,
-						mentorId: true
-					}
-				},
-				createdAt: true,
-				updatedAt: true
-			}
-		});
+  try {
+    const mentors = await prisma.mentor.findMany({
+      select: {
+        id: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phoneNumber: true,
+            userType: true,
+            profilePicture: true,
+            isVerified: true
+          }
+        },
+        bio: true,
+        categories: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            createdAt: true
+          }
+        },
+        pricing: {
+          select: {
+            id: true,
+            type: true,
+            price: true,
+            createdAt: true
+          }
+        },
+        isAvailable: true,
+        rating: true,
+        totalSessions: true,
+        availabilities: {
+          select: {
+            id: true,
+            dayOfWeek: true,
+            startTime: true,
+            endTime: true,
+            isAvailable: true,
+            mentorId: true
+          }
+        },
+        createdAt: true,
+        updatedAt: true
+      }
+    });
 
-		// console.log(mentors);
-		return { mentors, error: "" }
-	} catch (error) {
-		console.log(error);
-		return { mentors: [], error: "Error fetching mentors" }
-	}
+    return { mentors, error: "" }
+  } catch (error) {
+    console.log(error);
+    return { mentors: [], error: "Error fetching mentors" }
+  }
 }
+
 
 export const getMentor = async (id: string, token?: string) => {
 	try {
@@ -73,7 +80,14 @@ export const getMentor = async (id: string, token?: string) => {
 						profilePicture: true,
 						phoneNumber: true,
 						username: true,
-						email: true
+						email: true,
+					}
+				},
+				pricing: {
+					select: {
+						id: true,
+						price: true,
+						type: true
 					}
 				}
 			}

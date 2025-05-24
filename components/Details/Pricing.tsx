@@ -8,24 +8,29 @@ import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
 import Link from "next/link"
 
-// Extend Mentor with the included user relation fields
 export type MentorWithUser = {
   id: number;
   bio: string;
-  pricePerMinute: number;
   isAvailable: boolean;
   rating: number;
   totalSessions: number;
   createdAt: Date;
   updatedAt: Date;
   userId: number;
+  pricing: {
+    id: number;
+    type: "BASIC" | "STANDARD" | "PREMIUM";
+    price: number;
+    // createdAt: Date;
+  }[];
 } & {
   user: {
-    firstName: string | null,
-    lastName: string | null,
-    profilePicture: string | null
-  }
-}
+    firstName: string | null;
+    lastName: string | null;
+    profilePicture: string | null;
+  };
+};
+
 
 type PricingProps = {
   ref: React.RefObject<null | HTMLDivElement>
@@ -59,7 +64,8 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
         <form method="POST" action="https://api.chapa.co/v1/hosted/pay">
           <input type="hidden" name="public_key" value={process.env.NEXT_PUBLIC_CHAPA_PUBLIC_API_KEY} />
           <input type="hidden" name="tx_ref" value={txRef} onSubmit={() => setTxRef(nanoid())} />
-          <input type="hidden" name="amount" value={mentor.pricePerMinute} />
+          {/* make this dynamic */}
+          <input type="hidden" name="amount" value={mentor.pricing[0].price} />
           <input type="hidden" name="currency" value="ETB" />
           <input type="hidden" name="email" value="endekaluzemenu2134@gmail.com" />
           <input type="hidden" name="first_name" value="Endekalu" />
