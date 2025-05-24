@@ -1,7 +1,7 @@
-export default function Home() {
+import Home from "@/components/Home";
+
+export default function HomePage() {
   return (
-    <div className="bg-zinc-800 h-screen">
-      <p>hi</p>
-    </div>
+    <Home />
   );
 }
