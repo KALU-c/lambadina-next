@@ -93,8 +93,6 @@ export const fetchUser = async (token: string) => {
 			}
 		});
 
-		console.log(user)
-
 		if (!user) {
 			return { user: null, message: "User not found." }
 		}

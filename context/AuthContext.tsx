@@ -10,24 +10,47 @@ import { useRouter } from "next/navigation";
 import { fetchUser, loginUser, registerUser } from "@/actions/user";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserType | null>(
-    () => JSON.parse(localStorage.getItem('user') ?? "") as UserType || null
-  );
-  const [accessToken, setAccessToken] = useState<string | null>("");
+  const [user, setUser] = useState<UserType | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
   const router = useRouter();
 
+  // Safe localStorage access
+  const getLocalStorageItem = (key: string) => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(key);
+    }
+    return null;
+  };
+
+  const setLocalStorageItem = (key: string, value: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(key, value);
+    }
+  };
+
+  const removeLocalStorageItem = (key: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(key);
+    }
+  };
+
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
-    const storedUser = localStorage.getItem("user");
+    const storedToken = getLocalStorageItem("accessToken");
+    const storedUser = getLocalStorageItem("user");
 
     if (storedToken) {
       setAccessToken(storedToken);
     }
 
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+        removeLocalStorageItem("user");
+      }
     }
 
     setIsAuthLoaded(true);
@@ -43,8 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       setUser(user);
-      // TODO - do not save user data to ls
-      localStorage.setItem("user", JSON.stringify(user));
+      setLocalStorageItem("user", JSON.stringify(user));
     } catch {
       console.error("Error fetching user profile");
       toast.error("Failed to fetch user profile. Please try again.");
@@ -89,12 +111,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      // Fetch the user profile after successful login
       await fetchUserProfile(token);
 
       setAccessToken(token);
-      localStorage.setItem("accessToken", token);
-      // localStorage.setItem("refreshToken", refresh);
+      setLocalStorageItem("accessToken", token);
+      // setLocalStorageItem("refreshToken", refresh);
 
       toast.success("Logged in successfully 🎉");
       router.replace("/");
@@ -109,9 +130,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setUser(null);
     setAccessToken(null);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
+    removeLocalStorageItem("accessToken");
+    removeLocalStorageItem("refreshToken");
+    removeLocalStorageItem("user");
     router.replace("/login");
   };
 
@@ -119,7 +140,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, isLoading, register, login, logout, isAuthenticated, isAuthLoaded, setUser }}
+      value={{
+        user,
+        accessToken,
+        isLoading,
+        register,
+        login,
+        logout,
+        isAuthenticated,
+        isAuthLoaded,
+        setUser
+      }}
     >
       {children}
     </AuthContext.Provider>

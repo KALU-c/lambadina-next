@@ -91,7 +91,7 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
 
 
       {pricingTabs.map(pricing => (
-        <TabsContent value={pricing.value} className="font-light flex flex-col gap-4 rounded-b-xl">
+        <TabsContent key={pricing.value} value={pricing.value} className="font-light flex flex-col gap-4 rounded-b-xl">
           <p className="text-lg">
             {pricing.description}
           </p>

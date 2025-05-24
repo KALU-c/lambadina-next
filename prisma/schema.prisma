@@ -117,8 +117,10 @@ model MentorPricing {
   price     Float
   mentorId  Int         @map("mentor_id")
   createdAt DateTime    @default(now()) @map("created_at")
+  mentor    Mentor      @relation(fields: [mentorId], references: [id], onDelete: Cascade)
 
-  mentor Mentor @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  @@unique([mentorId, type], name: "mentor_pricing_unique")
+  @@map("mentor_pricings")
 }
 
 model MentorCategory {

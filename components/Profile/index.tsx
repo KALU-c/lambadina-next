@@ -25,13 +25,13 @@ import { toast } from "sonner";
 // import type { MentorProfile } from "@/types/mentor";
 import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
-import { AvatarUpload } from "./UploadImage";
+// import { AvatarUpload } from "./UploadImage";
 import Link from "next/link";
 import { fetchUser, updateUser } from "@/actions/user";
 import { useRouter } from "next/navigation";
-import { CldImage, CldUploadButton } from 'next-cloudinary';
+// import { CldImage, CldUploadButton } from 'next-cloudinary';
 import ProfilePicture from "./ProfilePicture";
-import { getMentor, getMentors } from "@/actions/mentors";
+import { getMentor, getMentors, updateMentor } from "@/actions/mentors";
 import { MentorProfile } from "@/types/mentors";
 
 // type UpdateMentorProfile = {
@@ -57,13 +57,30 @@ const clientProfileSchema = z.object({
   email: z.string().email(),
 });
 
-// const mentorProfileSchema = clientProfileSchema.extend({
-//   bio: z.string().min(10),
-//   pricePerMinute: z.string().min(1),
+
+// const mentorProfileSchema = z.object({
+//   fullName: z.string().min(2, {
+//     message: i18n.t("zod_full_name_min"),
+//   }),
+//   username: z.string().min(2, {
+//     message: i18n.t("zod_username_min"),
+//   }),
+//   phoneNumber: z.string().min(10, {
+//     message: i18n.t("zod_phone_number_min"),
+//   }),
+//   email: z.string().email({
+//     message: i18n.t("zod_email_invalid"),
+//   }),
+//   bio: z.string().min(10, {
+//     message: i18n.t("zod_bio_min"),
+//   }),
+//   pricePerMinute: z.string().min(1, {
+//     message: i18n.t("zod_bio_min"),
+//   }),
 //   is_available: z.boolean(),
 // });
 
-
+// In your schema definitions
 const mentorProfileSchema = z.object({
   fullName: z.string().min(2, {
     message: i18n.t("zod_full_name_min"),
@@ -80,8 +97,14 @@ const mentorProfileSchema = z.object({
   bio: z.string().min(10, {
     message: i18n.t("zod_bio_min"),
   }),
-  pricePerMinute: z.string().min(1, {
-    message: i18n.t("zod_bio_min"),
+  basicPrice: z.string().min(1, {
+    message: i18n.t("zod_price_required"),
+  }),
+  standardPrice: z.string().min(1, {
+    message: i18n.t("zod_price_required"),
+  }),
+  premiumPrice: z.string().min(1, {
+    message: i18n.t("zod_price_required"),
   }),
   is_available: z.boolean(),
 });
@@ -108,16 +131,18 @@ const Profile = () => {
     defaultValues: user?.user_type === "mentor"
       ? {
         fullName: "",
-        username: user?.username,
+        username: user?.username || "",
         phoneNumber: "",
         email: "",
         bio: "",
-        pricePerMinute: "",
+        basicPrice: "",
+        standardPrice: "",
+        premiumPrice: "",
         is_available: true
       }
       : {
         fullName: "",
-        username: user?.username,
+        username: user?.username || "",
         phoneNumber: "",
         email: ""
       }
@@ -130,35 +155,29 @@ const Profile = () => {
       try {
         if (user?.user_type === "mentor") {
           const { mentors: allMentorsResponse } = await getMentors();
+          const currentMentor = allMentorsResponse.find(mentor => mentor.user.id === user?.id);
+          const { mentor: mentorData } = await getMentor(currentMentor?.id.toString() ?? '', accessToken ?? '');
 
-          const currentMentor: MentorProfile | undefined = allMentorsResponse.find((mentor: MentorProfile) => mentor.user.id === user?.id);
+          if (mentorData) {
+            // Extract prices for each type
+            const basicPrice = mentorData.pricing.find(p => p.type === 'BASIC')?.price.toString() ?? '';
+            const standardPrice = mentorData.pricing.find(p => p.type === 'STANDARD')?.price.toString() ?? '';
+            const premiumPrice = mentorData.pricing.find(p => p.type === 'PREMIUM')?.price.toString() ?? '';
 
-          const mentorResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/${currentMentor?.id}`, {
-            headers: {
-              "Authorization": `Bearer ${accessToken}`,
-              "Content-Type": "application/json"
-            }
-          });
+            setProfileURL(mentorData.user.profilePicture ?? '');
 
-          // const { mentor: mentorData } = await getMentor(currentMentor?.id.toString() ?? '');
-
-          // if(!mentorData) {
-          //   router.replace("/login");
-          // }
-
-          const mentorData: MentorProfile = mentorResponse.data;
-
-          setProfileURL(mentorData.user.profilePicture ?? '');
-
-          form.reset({
-            fullName: `${mentorData.user.firstName || ''} ${mentorData.user.lastName || ''}`,
-            username: mentorData.user.username,
-            phoneNumber: mentorData.user.phoneNumber || '',
-            email: mentorData.user.email ?? '',
-            bio: mentorData.bio ?? '',
-            pricePerMinute: mentorData.pricing[0].price.toString() ?? '',
-            is_available: mentorData.isAvailable ?? true,
-          })
+            form.reset({
+              fullName: `${mentorData.user.firstName || ''} ${mentorData.user.lastName || ''}`,
+              username: mentorData.user.username,
+              phoneNumber: mentorData.user.phoneNumber || '',
+              email: mentorData.user.email ?? '',
+              bio: mentorData.bio ?? '',
+              basicPrice,
+              standardPrice,
+              premiumPrice,
+              is_available: mentorData.isAvailable ?? true,
+            });
+          }
         } else {
           if (!accessToken) {
             return router.push('/login');
@@ -206,38 +225,47 @@ const Profile = () => {
       if (user?.user_type === "mentor") {
         const [first_name, last_name] = mentorValue.fullName.split(" ");
 
-        formData.append("user[firstName]", first_name);
-        formData.append("user[lastName]", last_name);
-        formData.append("user[username]", mentorValue.username);
-        formData.append("user[email]", mentorValue.email);
-        formData.append("user[phoneNumber]", mentorValue.phoneNumber);
-        formData.append("user[userType]", user.user_type);
-        formData.append("bio", mentorValue.bio);
-        formData.append("pricePerMinute", mentorValue.pricePerMinute);
-        formData.append("isAvailable", String(mentorValue.is_available));
-        // formData.append("categories", JSON.stringify([])); // TODO: replace with actual categories
+        try {
+          const { mentor, error } = await updateMentor(accessToken ?? '', {
+            fullName: `${first_name} ${last_name}`,
+            phoneNumber: mentorValue.phoneNumber,
+            email: mentorValue.email,
+            bio: mentorValue.bio,
+            basicPrice: mentorValue.basicPrice,
+            standardPrice: mentorValue.standardPrice,
+            premiumPrice: mentorValue.premiumPrice,
+            is_available: mentorValue.is_available,
+            profilePicture: profileURL,
+            categories: [], // Add actual category IDs if you have them
+          });
 
-        if (profileURL) {
-          formData.append("user[profilePicture]", profileURL);
-        }
-
-        const response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentor/update/`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "multipart/form-data",
-            },
+          if (error) {
+            toast.error(error);
+            return;
           }
-        );
 
-        if (response.status === 200) {
-          toast.success("Mentor profile updated successfully!");
-          localStorage.setItem("mentor", JSON.stringify(response.data));
-          setIsEditing(false);
-        } else {
-          toast.error("Failed to update profile.");
+          if (mentor) {
+            toast.success("Mentor profile updated successfully!");
+            // Store the updated mentor data in localStorage if needed
+            localStorage.setItem("mentor", JSON.stringify(mentor));
+            setIsEditing(false);
+
+            // Update form values with the returned data
+            form.reset({
+              fullName: `${mentor.user.firstName || ''} ${mentor.user.lastName || ''}`,
+              username: mentor.user.username,
+              phoneNumber: mentor.user.phoneNumber || '',
+              email: mentor.user.email || '',
+              bio: mentor.bio || '',
+              basicPrice: mentor.pricing.find(p => p.type === 'BASIC')?.price.toString() || '',
+              standardPrice: mentor.pricing.find(p => p.type === 'STANDARD')?.price.toString() || '',
+              premiumPrice: mentor.pricing.find(p => p.type === 'PREMIUM')?.price.toString() || '',
+              is_available: mentor.isAvailable,
+            });
+          }
+        } catch (err) {
+          console.error("Update error:", err);
+          toast.error("An error occurred while updating your profile");
         }
       } else {
         const [first_name, last_name] = values.fullName.split(" ");
@@ -428,23 +456,71 @@ const Profile = () => {
                 </div>
 
                 <div className="flex flex-col space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="pricePerMinute"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Price Per Minute</FormLabel>
-                        <FormControl>
-                          <Input
-                            className="bg-zinc-100 h-10"
-                            disabled={!isEditing || isLoading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {user?.user_type === "mentor" && (
+                    <div className="pt-4">
+                      <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
+                        <User2 size={18} />
+                        {t("pricing")}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="basicPrice"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Basic Price ($/min)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  className="bg-zinc-100 h-10"
+                                  disabled={!isEditing || isLoading}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="standardPrice"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Standard Price ($/min)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  className="bg-zinc-100 h-10"
+                                  disabled={!isEditing || isLoading}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="premiumPrice"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Premium Price ($/min)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  className="bg-zinc-100 h-10"
+                                  disabled={!isEditing || isLoading}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <FormField
                     control={form.control}
                     name="is_available"

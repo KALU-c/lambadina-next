@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { getMentor } from "@/actions/mentors";
+import { useAuth } from "@/hooks/useAuth";
 
 
 type DetailsParams = {

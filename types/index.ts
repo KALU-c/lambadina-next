@@ -106,3 +106,8 @@ type UserUserPermission = {
 	userId: number;
 	permissionId: number;
 };
+
+export type PricingType =
+	"BASIC" |
+	"STANDARD" |
+	"PREMIUM";

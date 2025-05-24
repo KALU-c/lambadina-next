@@ -2,6 +2,8 @@
 
 import prisma from "@/lib/prisma";
 import { verifyToken } from "./user";
+import { revalidatePath } from "next/cache";
+import { PricingType } from "@/types";
 
 export const getMentors = async () => {
   try {
@@ -65,127 +67,194 @@ export const getMentors = async () => {
 
 
 export const getMentor = async (id: string, token?: string) => {
-	try {
-		if (token) {
-			verifyToken(token);
-		}
+  try {
+    let decoded: {
+      userId: number;
+      iat: number;
+      exp: number;
+    } | null = null;
 
-		const mentor = await prisma.mentor.findUnique({
-			where: { id: parseInt(id) },
-			include: {
-				user: {
-					select: {
-						firstName: true,
-						lastName: true,
-						profilePicture: true,
-						phoneNumber: true,
-						username: true,
-						email: true,
-					}
-				},
-				pricing: {
-					select: {
-						id: true,
-						price: true,
-						type: true
-					}
-				}
-			}
-		});
-		return { mentor, error: "" };
-	} catch (error) {
-		console.error(error);
-		return { mentor: null, error: "Error fetching mentor detail" };
-	}
+    if (token) {
+      decoded = await verifyToken(token);
+    }
+
+    const mentor = await prisma.mentor.findUnique({
+      where: { id: parseInt(id) || decoded?.userId },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            profilePicture: true,
+            phoneNumber: true,
+            username: true,
+            email: true,
+          }
+        },
+        pricing: {
+          select: {
+            id: true,
+            price: true,
+            type: true
+          }
+        }
+      }
+    });
+    return { mentor, error: "" };
+  } catch (error) {
+    console.error(error);
+    return { mentor: null, error: "Error fetching mentor detail" };
+  }
 };
 
 
-// export const updateMentor = async (token: string, formData: FormData) => {
-// 	try {
-// 		const decoded = await verifyToken(token);
+export const updateMentor = async (
+  token: string,
+  data: {
+    fullName: string;
+    phoneNumber: string;
+    email: string;
+    bio: string;
+    basicPrice: string;
+    standardPrice: string;
+    premiumPrice: string;
+    is_available: boolean;
+    profilePicture?: string;
+    categories?: number[];
+  }
+) => {
+  try {
+    // Verify the user token
+    const decoded = await verifyToken(token);
 
-// 		// Parse formData into separate userData and mentorData objects
-// 		const userData: any = {};
-// 		const mentorData: any = {};
+    if (!decoded.userId) {
+      return { error: "Unauthorized", mentor: null };
+    }
 
-// 		formData.forEach((value, key) => {
-// 			if (key.startsWith("user[")) {
-// 				// extract the field inside brackets, e.g. user[firstName] -> firstName
-// 				const userKey = key.match(/^user\[(.+)\]$/)?.[1];
-// 				if (userKey) {
-// 					userData[userKey] = value;
-// 				}
-// 			} else {
-// 				// non-user fields go to mentor
-// 				mentorData[key] = value;
-// 			}
-// 		});
+    // Split full name into first and last names
+    const [firstName, ...lastNameParts] = data.fullName.split(" ");
+    const lastName = lastNameParts.join(" ");
 
-// 		// Convert data types as needed
-// 		if (mentorData.pricePerMinute !== undefined) {
-// 			mentorData.pricePerMinute = parseFloat(mentorData.pricePerMinute as string);
-// 		}
-// 		if (mentorData.isAvailable !== undefined) {
-// 			mentorData.isAvailable = mentorData.isAvailable === "true";
-// 		}
-// 		// Add more conversions as needed...
+    // Update user data
+    const updatedUser = await prisma.user.update({
+      where: { id: decoded.userId },
+      data: {
+        firstName,
+        lastName,
+        phoneNumber: data.phoneNumber,
+        email: data.email,
+        profilePicture: data.profilePicture,
+      },
+    });
 
-// 		// Start a transaction to update both User and Mentor atomically
-// 		const updatedMentor = await prisma.$transaction(async (tx) => {
-// 			// Update User
-// 			const updatedUser = await tx.user.update({
-// 				where: { id: decoded.userId },
-// 				data: userData,
-// 				select: {
-// 					id: true,
-// 					firstName: true,
-// 					lastName: true,
-// 					username: true,
-// 					email: true,
-// 					phoneNumber: true,
-// 					userType: true,
-// 					profilePicture: true,
-// 					isVerified: true,
-// 				},
-// 			});
+    // Update mentor data
+    const updatedMentor = await prisma.mentor.upsert({
+      where: { userId: updatedUser.id },
+      update: {
+        bio: data.bio,
+        isAvailable: data.is_available,
+      },
+      create: {
+        bio: data.bio,
+        isAvailable: data.is_available,
+        rating: 0,
+        totalSessions: 0,
+        userId: updatedUser.id
+      },
+      include: {
+        user: true,
+        pricing: true,
+        mentorCategories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    });
 
-// 			// Update Mentor by userId
-// 			const updatedMentor = await tx.mentor.update({
-// 				where: { userId: decoded.userId },
-// 				data: mentorData,
-// 				select: {
-// 					id: true,
-// 					bio: true,
-// 					pricePerMinute: true,
-// 					isAvailable: true,
-// 					rating: true,
-// 					totalSessions: true,
-// 					createdAt: true,
-// 					updatedAt: true,
-// 					userId: true,
-// 					user: { // Include updated user data nested
-// 						select: {
-// 							id: true,
-// 							firstName: true,
-// 							lastName: true,
-// 							username: true,
-// 							email: true,
-// 							phoneNumber: true,
-// 							userType: true,
-// 							profilePicture: true,
-// 							isVerified: true,
-// 						},
-// 					},
-// 				},
-// 			});
+    // Update pricing for all three types
+    const pricingUpdates = [
+      {
+        type: "BASIC" as PricingType,
+        price: parseFloat(data.basicPrice),
+      },
+      {
+        type: "STANDARD" as PricingType,
+        price: parseFloat(data.standardPrice),
+      },
+      {
+        type: "PREMIUM" as PricingType,
+        price: parseFloat(data.premiumPrice),
+      },
+    ];
 
-// 			return updatedMentor;
-// 		});
+    // Upsert all pricing types
+    await Promise.all(
+      pricingUpdates.map((pricing) =>
+        prisma.mentorPricing.upsert({
+          where: {
+            mentor_pricing_unique: {
+              mentorId: updatedMentor.id,
+              type: pricing.type,
+            },
+          },
+          update: {
+            price: pricing.price,
+          },
+          create: {
+            mentorId: updatedMentor.id,
+            type: pricing.type,
+            price: pricing.price,
+          },
+        })
+      )
+    );
 
-// 		return { mentor: updatedMentor, error: "" };
-// 	} catch (error) {
-// 		console.error(error);
-// 		return { mentor: null, error: "Failed to update mentor profile." };
-// 	}
-// };
+    // Update categories if provided
+    if (data.categories && data.categories.length > 0) {
+      // First remove existing categories
+      await prisma.mentorCategory.deleteMany({
+        where: { mentorId: updatedMentor.id },
+      });
 
+      // Then add new ones
+      await prisma.mentorCategory.createMany({
+        data: data.categories.map((categoryId) => ({
+          mentorId: updatedMentor.id,
+          categoryId,
+        })),
+      });
+    }
+
+    // Revalidate paths
+    revalidatePath("/profile");
+    revalidatePath(`/mentors/${updatedMentor.id}`);
+
+    // Fetch updated mentor with all relations
+    const result = await prisma.mentor.findUnique({
+      where: { id: updatedMentor.id },
+      include: {
+        user: true,
+        pricing: true,
+        mentorCategories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    });
+
+    return {
+      mentor: result
+        ? {
+          ...result,
+          categories: result.mentorCategories.map((mc) => mc.category),
+        }
+        : null,
+      error: null,
+    };
+  } catch (error) {
+    console.error("Error updating mentor:", error);
+    return { error: "Failed to update mentor profile", mentor: null };
+  }
+};
