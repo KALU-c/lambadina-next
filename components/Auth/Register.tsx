@@ -51,7 +51,7 @@ const Register = () => {
 
         <Card>
           <CardHeader className="flex flex-col gap-8 items-center justify-center">
-            <Image src="/logo.png" alt="lambadina logo" className="h-8 text-center" width={100} height={30} />
+            <Image src="/logo.png" alt="lambadina logo" className="h-8 w-full object-contain text-center" width={100} height={30} />
 
             <div className="flex flex-col">
               <p className="text-center text-2xl">{t("register_create_account")}</p>

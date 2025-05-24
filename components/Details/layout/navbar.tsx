@@ -12,7 +12,7 @@ const DetailsNavbar = () => {
           <Image
             src="/logo.png"
             alt="lambadina logo"
-            className="h-6"
+            className="h-6 w-full object-contain"
             height={24}
             width={40}
           />

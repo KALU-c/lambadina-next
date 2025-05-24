@@ -9,7 +9,7 @@ const Navbar = () => {
         <Image
           src="/logo.png"
           alt="lambadina logo"
-          className="h-7"
+          className="h-6 w-full object-contain"
           width={50}
           height={20}
         />

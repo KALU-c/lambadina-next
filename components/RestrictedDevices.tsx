@@ -9,8 +9,8 @@ const RestrictedDevices = () => {
             <Image
               src="/404.png"
               alt="404"
-              width={500}
-              height={500}
+              width={600}
+              height={600}
             />
           </div>
         </div>
