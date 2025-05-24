@@ -1,0 +1,177 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+  // output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  mentor
+  client
+  admin
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  password       String
+  lastLogin      DateTime? @map("last_login")
+  isSuperuser    Boolean   @default(false) @map("is_superuser")
+  username       String    @unique
+  firstName      String?   @map("first_name")
+  lastName       String?   @map("last_name")
+  email          String?
+  isStaff        Boolean   @default(false) @map("is_staff")
+  isActive       Boolean   @default(true) @map("is_active")
+  dateJoined     DateTime  @default(now()) @map("date_joined")
+  userType       UserType  @default(client) @map("user_type")
+  phoneNumber    String?   @map("phone_number")
+  profilePicture String?   @map("profile_picture")
+  isVerified     Boolean   @default(false) @map("is_verified")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  client Client?
+  mentor Mentor?
+
+  userGroups      UserGroup[]
+  userPermissions UserUserPermission[]
+}
+
+model UserGroup {
+  id      Int  @id @default(autoincrement())
+  userId  Int  @map("user_id")
+  groupId Int  @map("group_id")
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+model UserUserPermission {
+  id           Int  @id @default(autoincrement())
+  userId       Int  @map("user_id")
+  permissionId Int  @map("permission_id")
+  User         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permissionId])
+}
+
+model Client {
+  id            Int      @id @default(autoincrement())
+  interests     String
+  totalSessions Int      @map("total_sessions")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  userId        Int      @unique @map("user_id")
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking Booking[]
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  mentorCategories MentorCategory[]
+  mentor           Mentor?          @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  mentorId         Int?
+}
+
+model Mentor {
+  id             Int      @id @default(autoincrement())
+  bio            String
+  pricePerMinute Float    @map("price_per_minute")
+  isAvailable    Boolean  @map("is_available")
+  rating         Float
+  totalSessions  Int      @map("total_sessions")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  userId         Int      @unique @map("user_id")
+
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mentorCategories MentorCategory[]
+  availabilities   MentorAvailability[]
+  booking          Booking[]
+  categories       Category[]
+}
+
+model MentorCategory {
+  id         Int      @id @default(autoincrement())
+  mentorId   Int      @map("mentor_id")
+  categoryId Int      @map("category_id")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  mentor     Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+
+  @@unique([mentorId, categoryId])
+}
+
+model MentorAvailability {
+  id          Int      @id @default(autoincrement())
+  dayOfWeek   Int      @map("day_of_week")
+  startTime   DateTime @map("start_time")
+  endTime     DateTime @map("end_time")
+  isAvailable Boolean  @map("is_available")
+  mentorId    Int      @map("mentor_id")
+  mentor      Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+
+  @@unique([mentorId, dayOfWeek, startTime, endTime])
+}
+
+model Booking {
+  id              Int      @id @default(autoincrement())
+  sessionDate     DateTime @map("session_date")
+  startTime       DateTime @map("start_time")
+  endTime         DateTime @map("end_time")
+  durationMinutes Int      @map("duration_minutes")
+  callType        String   @map("call_type")
+  status          String
+  amountPaid      Float    @map("amount_paid")
+  platformFee     Float    @map("platform_fee")
+  mentorPayout    Float    @map("mentor_payout")
+  paymentStatus   Boolean  @map("payment_status")
+  callLink        String?  @map("call_link")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  clientId        Int      @map("client_id")
+  mentorId        Int      @map("mentor_id")
+
+  client  Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  mentor  Mentor         @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  review  BookingReview?
+  payment Payment?
+}
+
+model BookingReview {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now()) @map("created_at")
+  bookingId Int      @unique @map("booking_id")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id                  Int      @id @default(autoincrement())
+  txRef               String   @unique @map("tx_ref")
+  amount              Float
+  currency            String
+  status              String
+  chapaTransactionRef String   @map("chapa_transaction_ref")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  bookingId           Int      @unique @map("booking_id")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
