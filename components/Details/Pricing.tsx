@@ -7,13 +7,25 @@ import { nanoid } from 'nanoid'
 import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
 import Link from "next/link"
-import { MentorProfile } from "@/types/mentors"
-import { Mentor, User } from "@prisma/client"
 
 // Extend Mentor with the included user relation fields
-type MentorWithUser = Mentor & {
-  user: Pick<User, "firstName" | "lastName" | "profilePicture">;
-};
+export type MentorWithUser = {
+  id: number;
+  bio: string;
+  pricePerMinute: number;
+  isAvailable: boolean;
+  rating: number;
+  totalSessions: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+} & {
+  user: {
+    firstName: string | null,
+    lastName: string | null,
+    profilePicture: string | null
+  }
+}
 
 type PricingProps = {
   ref: React.RefObject<null | HTMLDivElement>

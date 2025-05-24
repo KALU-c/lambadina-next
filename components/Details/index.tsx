@@ -6,7 +6,7 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import AboutMe from "./AboutMe";
 import Profile from "./Profile";
-import Pricing from "./Pricing";
+import Pricing, { MentorWithUser } from "./Pricing";
 import CTA from "../Home/CTA";
 import FAQ from "./FAQ-accordion";
 import Footer from "../Footer";
@@ -14,16 +14,14 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { getMentor } from "@/actions/mentors";
-import type { Mentor, User } from "@prisma/client";
+
 
 type DetailsParams = {
   mentorId: string;
 };
 
 // Extend Mentor with the included user relation fields
-type MentorWithUser = Mentor & {
-  user: Pick<User, "firstName" | "lastName" | "profilePicture">;
-};
+
 
 const Details = ({ mentorId }: DetailsParams) => {
   const { t } = useTranslation();
