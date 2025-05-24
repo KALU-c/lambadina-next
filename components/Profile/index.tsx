@@ -44,8 +44,22 @@ import Link from "next/link";
 //   is_available: boolean;
 // };
 
+const clientProfileSchema = z.object({
+  fullName: z.string().min(2),
+  username: z.string().min(2),
+  phoneNumber: z.string().min(10),
+  email: z.string().email(),
+  profile_picture: z.union([z.instanceof(File), z.string().max(0)]).optional(),
+});
 
-const profileFormSchema = z.object({
+// const mentorProfileSchema = clientProfileSchema.extend({
+//   bio: z.string().min(10),
+//   price_per_minute: z.string().min(1),
+//   is_available: z.boolean(),
+// });
+
+
+const mentorProfileSchema = z.object({
   fullName: z.string().min(2, {
     message: i18n.t("zod_full_name_min"),
   }),
@@ -70,6 +84,10 @@ const profileFormSchema = z.object({
     .optional(),
 });
 
+type ClientProfileSchemaType = z.infer<typeof clientProfileSchema>
+type MentorProfileSchemaType = z.infer<typeof mentorProfileSchema>
+type CombinedProfileSchemaType = MentorProfileSchemaType | ClientProfileSchemaType;
+
 
 const Profile = () => {
   const { t } = useTranslation()
@@ -80,18 +98,29 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
 
 
-  const form = useForm<z.infer<typeof profileFormSchema>>({
-    resolver: zodResolver(profileFormSchema),
-    defaultValues: {
-      fullName: "",
-      username: user?.username,
-      phoneNumber: "",
-      email: "",
-      bio: "",
-      price_per_minute: "",
-      is_available: true,
-      profile_picture: ""
-    },
+
+  const form = useForm<CombinedProfileSchemaType>({
+    resolver: zodResolver(
+      user?.user_type === "mentor" ? mentorProfileSchema : clientProfileSchema
+    ),
+    defaultValues: user?.user_type === "mentor"
+      ? {
+        fullName: "",
+        username: user?.username,
+        phoneNumber: "",
+        email: "",
+        bio: "",
+        price_per_minute: "",
+        is_available: true,
+        profile_picture: ""
+      }
+      : {
+        fullName: "",
+        username: user?.username,
+        phoneNumber: "",
+        email: "",
+        profile_picture: ""
+      }
   });
 
 
@@ -154,28 +183,30 @@ const Profile = () => {
     fetchProfile();
   }, [form, user?.id, user?.user_type, accessToken]);
 
-  const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+  const onSubmit = async (values: CombinedProfileSchemaType) => {
+    console.log("Submitting form with values:", values);
+    const mentorValue = values as MentorProfileSchemaType
     setIsLoading(true);
 
     try {
       const formData = new FormData();
 
       if (user?.user_type === "mentor") {
-        const [first_name, last_name] = values.fullName.split(" ");
+        const [first_name, last_name] = mentorValue.fullName.split(" ");
 
         formData.append("user[first_name]", first_name);
         formData.append("user[last_name]", last_name);
-        formData.append("user[username]", values.username);
-        formData.append("user[email]", values.email);
-        formData.append("user[phone_number]", values.phoneNumber);
+        formData.append("user[username]", mentorValue.username);
+        formData.append("user[email]", mentorValue.email);
+        formData.append("user[phone_number]", mentorValue.phoneNumber);
         formData.append("user[user_type]", user.user_type);
-        formData.append("bio", values.bio);
-        formData.append("price_per_minute", values.price_per_minute);
-        formData.append("is_available", String(values.is_available));
+        formData.append("bio", mentorValue.bio);
+        formData.append("price_per_minute", mentorValue.price_per_minute);
+        formData.append("is_available", String(mentorValue.is_available));
         // formData.append("categories", JSON.stringify([])); // TODO: replace with actual categories
 
-        if (values.profile_picture) {
-          formData.append("user[profile_picture]", values.profile_picture);
+        if (mentorValue.profile_picture) {
+          formData.append("user[profile_picture]", mentorValue.profile_picture);
         }
 
         const response = await axios.patch(

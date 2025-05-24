@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils"
-import { useTranslation } from "react-i18next"
-// import { ArrowRight } from "lucide-react"
+import i18next from "i18next"
 
 type SectionIndicatorProps = {
   highlightMainText?: boolean
@@ -15,8 +14,6 @@ const SectionIndicator = ({
   text,
   className
 }: SectionIndicatorProps) => {
-  const { t } = useTranslation()
-
   return (
     <div className={cn("flex flex-col gap-3 py-2", className)}>
       <div className="text-3xl text-muted-foreground">
@@ -27,10 +24,10 @@ const SectionIndicator = ({
               highlightMainText && "bg-[#d9d9d9] p-1 px-2 rounded-[8px]"
             )}
           >
-            {t(mainText)}
+            {i18next.t(mainText)}
           </span>
         )}
-        {t(text)}
+        {i18next.t(text)}
       </div>
       {/* <div className="flex flex-row gap-2 text-xl items-center">
         See all

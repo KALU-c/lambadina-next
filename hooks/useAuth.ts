@@ -1,3 +1,5 @@
+"use client"
+
 import type { registerSchema } from "@/schema/registerSchema";
 import { createContext, useContext } from "react";
 import { z } from "zod";
