@@ -86,92 +86,92 @@ export const getMentor = async (id: string, token?: string) => {
 };
 
 
-export const updateMentor = async (token: string, formData: FormData) => {
-	try {
-		const decoded = await verifyToken(token);
+// export const updateMentor = async (token: string, formData: FormData) => {
+// 	try {
+// 		const decoded = await verifyToken(token);
 
-		// Parse formData into separate userData and mentorData objects
-		const userData: any = {};
-		const mentorData: any = {};
+// 		// Parse formData into separate userData and mentorData objects
+// 		const userData: any = {};
+// 		const mentorData: any = {};
 
-		formData.forEach((value, key) => {
-			if (key.startsWith("user[")) {
-				// extract the field inside brackets, e.g. user[firstName] -> firstName
-				const userKey = key.match(/^user\[(.+)\]$/)?.[1];
-				if (userKey) {
-					userData[userKey] = value;
-				}
-			} else {
-				// non-user fields go to mentor
-				mentorData[key] = value;
-			}
-		});
+// 		formData.forEach((value, key) => {
+// 			if (key.startsWith("user[")) {
+// 				// extract the field inside brackets, e.g. user[firstName] -> firstName
+// 				const userKey = key.match(/^user\[(.+)\]$/)?.[1];
+// 				if (userKey) {
+// 					userData[userKey] = value;
+// 				}
+// 			} else {
+// 				// non-user fields go to mentor
+// 				mentorData[key] = value;
+// 			}
+// 		});
 
-		// Convert data types as needed
-		if (mentorData.pricePerMinute !== undefined) {
-			mentorData.pricePerMinute = parseFloat(mentorData.pricePerMinute as string);
-		}
-		if (mentorData.isAvailable !== undefined) {
-			mentorData.isAvailable = mentorData.isAvailable === "true";
-		}
-		// Add more conversions as needed...
+// 		// Convert data types as needed
+// 		if (mentorData.pricePerMinute !== undefined) {
+// 			mentorData.pricePerMinute = parseFloat(mentorData.pricePerMinute as string);
+// 		}
+// 		if (mentorData.isAvailable !== undefined) {
+// 			mentorData.isAvailable = mentorData.isAvailable === "true";
+// 		}
+// 		// Add more conversions as needed...
 
-		// Start a transaction to update both User and Mentor atomically
-		const updatedMentor = await prisma.$transaction(async (tx) => {
-			// Update User
-			const updatedUser = await tx.user.update({
-				where: { id: decoded.userId },
-				data: userData,
-				select: {
-					id: true,
-					firstName: true,
-					lastName: true,
-					username: true,
-					email: true,
-					phoneNumber: true,
-					userType: true,
-					profilePicture: true,
-					isVerified: true,
-				},
-			});
+// 		// Start a transaction to update both User and Mentor atomically
+// 		const updatedMentor = await prisma.$transaction(async (tx) => {
+// 			// Update User
+// 			const updatedUser = await tx.user.update({
+// 				where: { id: decoded.userId },
+// 				data: userData,
+// 				select: {
+// 					id: true,
+// 					firstName: true,
+// 					lastName: true,
+// 					username: true,
+// 					email: true,
+// 					phoneNumber: true,
+// 					userType: true,
+// 					profilePicture: true,
+// 					isVerified: true,
+// 				},
+// 			});
 
-			// Update Mentor by userId
-			const updatedMentor = await tx.mentor.update({
-				where: { userId: decoded.userId },
-				data: mentorData,
-				select: {
-					id: true,
-					bio: true,
-					pricePerMinute: true,
-					isAvailable: true,
-					rating: true,
-					totalSessions: true,
-					createdAt: true,
-					updatedAt: true,
-					userId: true,
-					user: { // Include updated user data nested
-						select: {
-							id: true,
-							firstName: true,
-							lastName: true,
-							username: true,
-							email: true,
-							phoneNumber: true,
-							userType: true,
-							profilePicture: true,
-							isVerified: true,
-						},
-					},
-				},
-			});
+// 			// Update Mentor by userId
+// 			const updatedMentor = await tx.mentor.update({
+// 				where: { userId: decoded.userId },
+// 				data: mentorData,
+// 				select: {
+// 					id: true,
+// 					bio: true,
+// 					pricePerMinute: true,
+// 					isAvailable: true,
+// 					rating: true,
+// 					totalSessions: true,
+// 					createdAt: true,
+// 					updatedAt: true,
+// 					userId: true,
+// 					user: { // Include updated user data nested
+// 						select: {
+// 							id: true,
+// 							firstName: true,
+// 							lastName: true,
+// 							username: true,
+// 							email: true,
+// 							phoneNumber: true,
+// 							userType: true,
+// 							profilePicture: true,
+// 							isVerified: true,
+// 						},
+// 					},
+// 				},
+// 			});
 
-			return updatedMentor;
-		});
+// 			return updatedMentor;
+// 		});
 
-		return { mentor: updatedMentor, error: "" };
-	} catch (error) {
-		console.error(error);
-		return { mentor: null, error: "Failed to update mentor profile." };
-	}
-};
+// 		return { mentor: updatedMentor, error: "" };
+// 	} catch (error) {
+// 		console.error(error);
+// 		return { mentor: null, error: "Failed to update mentor profile." };
+// 	}
+// };
 
