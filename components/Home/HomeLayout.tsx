@@ -1,3 +1,5 @@
+"use client"
+
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import ExpertsCard from "./layout/experts-card"
 import SectionIndicator from "./layout/section-indicator"
@@ -32,8 +34,8 @@ const HomeLayout = () => {
     const fetchData = async () => {
       try {
         const [mentorsRes, categoriesRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/mentors/mentors/`),
-          fetch(`${import.meta.env.VITE_API_URL}/api/mentors/categories/`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/categories/`),
         ])
 
         const mentorsData = await mentorsRes.json()

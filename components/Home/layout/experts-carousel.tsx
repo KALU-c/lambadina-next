@@ -1,10 +1,12 @@
+"use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Suspense, useEffect, useState } from "react"
 import ExpertsCarouselSkeleton from "./experts-carousel-skeleton"
-import { Link } from "react-router"
 // import { MENTORS } from "@/constants/mentors"
 import type { MentorProfile } from "@/types/mentor"
 import { useTranslation } from "react-i18next"
+import Link from "next/link"
 
 const ExpertsCarousel = () => {
   const { t } = useTranslation();
@@ -16,7 +18,7 @@ const ExpertsCarousel = () => {
     const fetchData = async () => {
       try {
         const [mentorsRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/mentors/mentors/`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/`),
         ])
 
         const mentorsData = await mentorsRes.json()
@@ -65,7 +67,7 @@ const ExpertsCarousel = () => {
             <div className="flex flex-row gap-6 overflow-x-auto scrollbar-hide py-2 -mx-[22px] px-[22px]">
               {topRatedMentors.map((mentor) => (
                 <Link
-                  to={`/mentors/${mentor.id}`}
+                  href={`/mentors/${mentor.id}`}
                   key={mentor.id}
                 >
                   <Avatar className="h-[96px] w-[96px]">

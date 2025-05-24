@@ -1,4 +1,5 @@
-import { Link, useParams } from "react-router";
+"use client"
+
 import DetailsNavbar from "./layout/navbar";
 import { Star } from "lucide-react";
 import { Separator } from "../ui/separator";
@@ -13,19 +14,23 @@ import { useEffect, useRef, useState } from "react";
 import type { MentorProfile } from "@/types/mentor";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
 
-const Details = () => {
+type DetailsParams = {
+  mentorId: string
+}
+
+const Details = ({ mentorId }: DetailsParams) => {
   const { t } = useTranslation();
 
   const [mentor, setMentor] = useState<MentorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const pricingRef = useRef<HTMLDivElement | null>(null);
-  const { mentorId } = useParams();
 
   useEffect(() => {
     const fetchMentor = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/mentors/mentors/${mentorId}/`);
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/${mentorId}/`);
         // console.log("Fetched Mentor:", data);
         setMentor(data);
       } catch {
@@ -61,7 +66,7 @@ const Details = () => {
         <DetailsNavbar />
 
         <div className="flex flex-row gap-2 text-lg flex-wrap">
-          <Link to={"/"}>{t("details_breadcrumb_home")}</Link>
+          <Link href={"/"}>{t("details_breadcrumb_home")}</Link>
           /
           <span className="text-muted-foreground">
             {mentor.user.first_name ?? ''} {mentor.user.last_name ?? ''}

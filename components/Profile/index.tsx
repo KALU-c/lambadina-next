@@ -1,5 +1,6 @@
+"use client"
+
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import DetailsNavbar from "../Details/layout/navbar";
 import Footer from "../Footer";
 import { Loader, User2 } from "lucide-react";
@@ -25,6 +26,7 @@ import type { MentorProfile } from "@/types/mentor";
 import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
 import { AvatarUpload } from "./UploadImage";
+import Link from "next/link";
 
 // type UpdateMentorProfile = {
 //   user: {
@@ -98,11 +100,11 @@ const Profile = () => {
       setIsLoading(true);
       try {
         if (user?.user_type === "mentor") {
-          const allMentorsResponse: { data: MentorProfile[] } = await axios.get(`${import.meta.env.VITE_API_URL}/api/mentors/mentors`);
+          const allMentorsResponse: { data: MentorProfile[] } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors`);
 
           const currentMentor: MentorProfile | undefined = allMentorsResponse.data.find(mentor => mentor.user.id === user?.id);
 
-          const mentorResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/mentors/mentors/${currentMentor?.id}`, {
+          const mentorResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentors/${currentMentor?.id}`, {
             headers: {
               "Authorization": `Bearer ${accessToken}`,
               "Content-Type": "application/json"
@@ -122,7 +124,7 @@ const Profile = () => {
             profile_picture: mentorData.user.profile_picture
           })
         } else {
-          const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/profile/`, {
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/`, {
             headers: {
               "Authorization": `Bearer ${accessToken}`,
               "Content-Type": "application/json"
@@ -177,7 +179,7 @@ const Profile = () => {
         }
 
         const response = await axios.patch(
-          `${import.meta.env.VITE_API_URL}/api/mentors/mentor/update/`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/mentors/mentor/update/`,
           formData,
           {
             headers: {
@@ -209,7 +211,7 @@ const Profile = () => {
         }
 
         const response = await axios.patch(
-          `${import.meta.env.VITE_API_URL}/api/users/profile/`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/`,
           formData,
           {
             headers: {
@@ -249,7 +251,7 @@ const Profile = () => {
         <DetailsNavbar />
 
         <div className="flex flex-row gap-2 text-lg flex-wrap">
-          <Link to={"/"} className="text-muted-foreground">{t("profile")}</Link>/
+          <Link href={"/"} className="text-muted-foreground">{t("profile")}</Link>/
           <span>{user?.username}</span>
         </div>
 

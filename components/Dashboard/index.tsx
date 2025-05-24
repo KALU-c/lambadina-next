@@ -1,4 +1,5 @@
-import { Link } from "react-router"
+"use client"
+
 import DetailsNavbar from "../Details/layout/navbar"
 import Footer from "../Footer"
 import { useTranslation } from "react-i18next"
@@ -10,6 +11,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import type { Booking } from "@/types/booking"
 import { toast } from "sonner"
+import Link from "next/link"
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -20,7 +22,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/bookings/list`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/list`, {
           headers: {
             "Authorization": `Bearer ${accessToken}`,
             "Content-Type": "application/json"
@@ -50,7 +52,7 @@ const Dashboard = () => {
         <DetailsNavbar />
 
         <div className="flex flex-row gap-2 text-lg flex-wrap">
-          <Link to={"/"} className="text-muted-foreground">
+          <Link href={"/"} className="text-muted-foreground">
             {t("dashboard")}
           </Link>/
           <span>{user?.username}</span>

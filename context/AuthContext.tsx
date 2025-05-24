@@ -1,17 +1,19 @@
+"use client"
+
 import { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { registerSchema } from "@/schema/registerSchema";
 import { AuthContext, type UserType } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserType | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
@@ -30,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUserProfile = async (token: string) => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/profile/`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/profile/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -50,13 +52,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/users/register/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/register/`,
         values
       );
 
       // After successful registration, log the user in
       const loginRes = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/users/login/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/login/`,
         {
           username: values.username,
           password: values.password,
@@ -73,7 +75,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("refreshToken", refresh);
 
       toast.success("Account created and logged in successfully 🎉");
-      navigate("/profile");
+      router.replace("/profile");
     } catch (err) {
       console.error(err);
       if (err instanceof AxiosError) {
@@ -90,7 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       const loginRes = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/users/login/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/login/`,
         {
           username,
           password,
@@ -107,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("refreshToken", refresh);
 
       toast.success("Logged in successfully 🎉");
-      navigate("/");
+      router.replace("/");
     } catch (err) {
       console.error(err);
       toast.error("Invalid credentials. Please try again.");
@@ -122,7 +124,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
-    navigate("/login");
+    router.replace("/login");
   };
 
   const isAuthenticated = !!accessToken;

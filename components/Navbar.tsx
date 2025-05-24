@@ -1,10 +1,10 @@
-import { Link } from "react-router"
+import Link from "next/link"
 import MenuSheet from "./menu-sheet"
 
 const Navbar = () => {
   return (
     <div className="h-16 flex flex-row items-center justify-between">
-      <Link to={"/"}>
+      <Link href={"/"}>
         <img
           src="/logo.png"
           alt="lambadina logo"

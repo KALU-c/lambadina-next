@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import Footer from "../Footer";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
@@ -21,6 +20,7 @@ import { registerSchema } from "@/schema/registerSchema";
 import * as z from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
 
 const Register = () => {
   const { t } = useTranslation();
@@ -157,7 +157,7 @@ const Register = () => {
                 </Button>
                 <p className="text-muted-foreground">
                   {t("register_already_have_an_account")}{" "}
-                  <Link to={"/login"}>
+                  <Link href={"/login"}>
                     <span className="underline underline-offset-1 text-[#FFB000]">
                       {t("register_sign_in")}
                     </span>

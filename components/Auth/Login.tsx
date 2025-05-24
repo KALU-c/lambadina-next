@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import Footer from "../Footer";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
@@ -19,6 +18,7 @@ import { loginSchema } from "@/schema/loginSchema";
 import { Loader } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -105,7 +105,7 @@ const Login = () => {
                 </Button>
                 <p className="text-muted-foreground">
                   {t("login_dont_have_account")}{" "}
-                  <Link to={"/register"}>
+                  <Link href={"/register"}>
                     <span className="underline underline-offset-1 text-[#FFB000]">
                       {t("login_register")}
                     </span>

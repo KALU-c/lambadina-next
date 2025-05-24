@@ -1,11 +1,13 @@
+"use client"
+
 import { useState } from "react"
 import { Button } from "../ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./layout/pricing-tabs"
 import { nanoid } from 'nanoid'
 import { useAuth } from "@/hooks/useAuth"
-import { Link } from "react-router"
 import type { MentorProfile } from "@/types/mentor"
 import { toast } from "sonner"
+import Link from "next/link"
 
 type PricingProps = {
   ref: React.RefObject<null | HTMLDivElement>
@@ -37,7 +39,7 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
         </ul>
 
         <form method="POST" action="https://api.chapa.co/v1/hosted/pay">
-          <input type="hidden" name="public_key" value={import.meta.env.VITE_CHAPA_PUBLIC_API_KEY} />
+          <input type="hidden" name="public_key" value={process.env.NEXT_PUBLIC_CHAPA_PUBLIC_API_KEY} />
           <input type="hidden" name="tx_ref" value={txRef} onSubmit={() => setTxRef(nanoid())} />
           <input type="hidden" name="amount" value={mentor.price_per_minute} />
           <input type="hidden" name="currency" value="ETB" />
@@ -47,7 +49,7 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
           <input type="hidden" name="title" value="Mentorship" />
           <input type="hidden" name="description" value="lorem" />
           <input type="hidden" name="callback_url" value="" />
-          <input type="hidden" name="return_url" value={import.meta.env.VITE_BASE_URL} />
+          <input type="hidden" name="return_url" value={process.env.NEXT_PUBLIC_BASE_URL} />
 
           {isAuthenticated ? (
             <>
@@ -56,7 +58,7 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
                   Book Now
                 </Button>
               ) : (
-                <Link to={'/profile'} onClick={() => toast.info('Please complete your profile to book a session')}>
+                <Link href={'/profile'} onClick={() => toast.info('Please complete your profile to book a session')}>
                   <Button size={'xlg'} className="text-black w-full">
                     Book Now
                   </Button>
@@ -64,7 +66,7 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
               )}
             </>
           ) : (
-            <Link to={'/login'}>
+            <Link href={'/login'}>
               <Button size={'xlg'} className="text-black w-full">
                 Book Now
               </Button>

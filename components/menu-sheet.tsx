@@ -1,3 +1,5 @@
+"use client"
+
 import { BadgeInfo, Blend, LayoutDashboardIcon, LogOut, Menu, User2, Users2 } from "lucide-react"
 import {
   Sheet,
@@ -7,10 +9,10 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { Link } from "react-router"
 import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "react-i18next"
 import ChangeLanguage from "./change-language"
+import Link from "next/link"
 
 const MenuSheet = () => {
   const { t } = useTranslation();
@@ -24,7 +26,7 @@ const MenuSheet = () => {
         </SheetTrigger>
         <SheetContent>
           <SheetHeader className="mt-10 gap-3">
-            <Link to='/'>
+            <Link href='/'>
               <Button variant={'secondary'} className="w-full justify-start items-center py-4">
                 <Users2 className="mr-2" />
                 {t('find_mentor')}
@@ -32,14 +34,14 @@ const MenuSheet = () => {
             </Link>
             {isAuthenticated && (
               <>
-                <Link to={"/profile"}>
+                <Link href={"/profile"}>
                   <Button variant={'secondary'} className="justify-start items-center py-4 w-full">
                     <User2 className="mr-2" />
                     {t('profile')}
                   </Button>
                 </Link>
 
-                <Link to={"/dashboard"}>
+                <Link href={"/dashboard"}>
                   <Button variant={'secondary'} className="justify-start items-center py-4 w-full">
                     <LayoutDashboardIcon className="mr-2" />
                     {t('dashboard')}
@@ -67,12 +69,12 @@ const MenuSheet = () => {
               </>
             ) : (
               <>
-                <Link to={'/login'}>
+                <Link href={'/login'}>
                   <Button variant={'secondary'} className="w-full">
                     {t('login')}
                   </Button>
                 </Link>
-                <Link to={'/register'}>
+                <Link href={'/register'}>
                   <Button className="w-full">
                     {t('sign_up')}
                   </Button>
