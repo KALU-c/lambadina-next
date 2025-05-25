@@ -34,7 +34,6 @@ const Dashboard = () => {
         const { mentor: mentorData, error: mentorDataError } = await getMentorByAccessToken(accessToken ?? "");
 
         if (error || mentorDataError) {
-          toast.error(error);
           return;
         }
 

@@ -1,9 +1,9 @@
 "use client"
 
-import {
-  SiInstagram,
-  SiX
-} from '@icons-pack/react-simple-icons'
+// import {
+//   SiInstagram,
+//   SiX
+// } from '@icons-pack/react-simple-icons'
 import { Separator } from './ui/separator'
 import { useTranslation } from 'react-i18next'
 
@@ -20,7 +20,7 @@ const Footer = () => {
         {t("footer_description")}
       </p>
 
-      <div className='flex flex-col gap-4 py-6'>
+      {/* <div className='flex flex-col gap-4 py-6'>
         <span className='font-semibold text-xl'>{t("footer_follow_us")}</span>
         <div className='flex flex-row gap-4 items-center'>
           <div className='p-3 rounded-full bg-white'>
@@ -59,7 +59,7 @@ const Footer = () => {
           <span className='text-lg text-[#E8E4DF] font-light'>{t("footer_footer")}</span>
           <span className='text-lg text-[#E8E4DF] font-light'>{t("footer_terms")}</span>
         </div>
-      </div>
+      </div> */}
 
       <Separator className='bg-[#D8D8D8]' />
 

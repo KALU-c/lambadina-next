@@ -12,7 +12,7 @@ const Home = () => {
         <Navbar />
         <HomeLayout />
       </div>
-      <div className="bg-[url('/bg.jpg')] h-[380px]">
+      {/* <div className="bg-[url('/bg.jpg')] h-[380px]">
         <div className='bg-black/50 flex flex-col justify-center gap-6 w-full px-6 h-[380px]'>
           <p className="text-3xl font-medium text-center text-white">
             {i18next.t("home_subscribe")}
@@ -25,7 +25,7 @@ const Home = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </div> */}
       <Footer />
     </main>
   )
