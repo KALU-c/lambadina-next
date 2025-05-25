@@ -168,14 +168,14 @@ const Dashboard = () => {
                             </p>
                           </div>
 
-                          <div className="flex flex-row gap-2">
+                          {/* <div className="flex flex-row gap-2">
                             <Button className="flex-1" size={'sm'} disabled>
                               {t("dashboard_accept")}
                             </Button>
                             <Button className="flex-1 bg-zinc-200" size={'sm'} variant={'secondary'} disabled>
                               {t("dashboard_decline")}
                             </Button>
-                          </div>
+                          </div> */}
                         </AccordionContent>
                       </AccordionItem>
                     ))}
