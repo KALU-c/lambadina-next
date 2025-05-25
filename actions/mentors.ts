@@ -118,8 +118,24 @@ export const updateMentor = async (
     // Verify the user token
     const decoded = await verifyToken(token);
 
-    if (!decoded.userId) {
+    console.log(decoded)
+
+    if (!decoded?.userId) {
       return { error: "Unauthorized", mentor: null };
+    }
+
+    // First check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id: decoded.userId }
+    });
+
+    if (!existingUser) {
+      return { error: "User not found", mentor: null };
+    }
+
+    // Validate required fields
+    if (!data.fullName || !data.email) {
+      return { error: "Full name and email are required", mentor: null };
     }
 
     // Split full name into first and last names
@@ -130,20 +146,25 @@ export const updateMentor = async (
     const updatedUser = await prisma.user.update({
       where: { id: decoded.userId },
       data: {
-        firstName,
-        lastName,
-        phoneNumber: data.phoneNumber,
-        email: data.email,
-        profilePicture: data.profilePicture,
+        firstName: firstName || existingUser.firstName,
+        lastName: lastName || existingUser.lastName,
+        phoneNumber: data.phoneNumber || existingUser.phoneNumber,
+        email: data.email || existingUser.email,
+        profilePicture: data.profilePicture || existingUser.profilePicture,
       },
     });
 
-    // Update mentor data
+    // Check if mentor exists
+    const existingMentor = await prisma.mentor.findUnique({
+      where: { userId: updatedUser.id }
+    });
+
+    // Update or create mentor data
     const updatedMentor = await prisma.mentor.upsert({
       where: { userId: updatedUser.id },
       update: {
-        bio: data.bio,
-        isAvailable: data.is_available,
+        bio: data.bio || existingMentor?.bio,
+        isAvailable: data.is_available ?? existingMentor?.isAvailable ?? true,
       },
       create: {
         bio: data.bio,
@@ -163,23 +184,23 @@ export const updateMentor = async (
       },
     });
 
-    // Update pricing for all three types
+    // Validate and parse prices
     const pricingUpdates = [
       {
         type: "BASIC" as PricingType,
-        price: parseFloat(data.basicPrice),
+        price: parseFloat(data.basicPrice) || 0,
       },
       {
         type: "STANDARD" as PricingType,
-        price: parseFloat(data.standardPrice),
+        price: parseFloat(data.standardPrice) || 0,
       },
       {
         type: "PREMIUM" as PricingType,
-        price: parseFloat(data.premiumPrice),
+        price: parseFloat(data.premiumPrice) || 0,
       },
     ];
 
-    // Upsert all pricing types
+    // Upsert all pricing types with error handling
     await Promise.all(
       pricingUpdates.map((pricing) =>
         prisma.mentorPricing.upsert({
@@ -197,24 +218,42 @@ export const updateMentor = async (
             type: pricing.type,
             price: pricing.price,
           },
+        }).catch(error => {
+          console.error(`Error updating ${pricing.type} pricing:`, error);
+          throw error;
         })
       )
     );
 
     // Update categories if provided
     if (data.categories && data.categories.length > 0) {
-      // First remove existing categories
-      await prisma.mentorCategory.deleteMany({
-        where: { mentorId: updatedMentor.id },
-      });
+      try {
+        // First remove existing categories
+        await prisma.mentorCategory.deleteMany({
+          where: { mentorId: updatedMentor.id },
+        });
 
-      // Then add new ones
-      await prisma.mentorCategory.createMany({
-        data: data.categories.map((categoryId) => ({
-          mentorId: updatedMentor.id,
-          categoryId,
-        })),
-      });
+        // Verify categories exist
+        const existingCategories = await prisma.category.findMany({
+          where: { id: { in: data.categories } }
+        });
+
+        if (existingCategories.length !== data.categories.length) {
+          console.warn("Some categories not found");
+        }
+
+        // Then add new ones
+        await prisma.mentorCategory.createMany({
+          data: data.categories.map((categoryId) => ({
+            mentorId: updatedMentor.id,
+            categoryId,
+          })),
+          skipDuplicates: true,
+        });
+      } catch (error) {
+        console.error("Error updating categories:", error);
+        throw error;
+      }
     }
 
     // Revalidate paths
@@ -236,16 +275,17 @@ export const updateMentor = async (
     });
 
     return {
-      mentor: result
-        ? {
-          ...result,
-          categories: result.categories.map((mc) => mc.category),
-        }
-        : null,
+      mentor: result ? {
+        ...result,
+        categories: result.categories.map((mc) => mc.category),
+      } : null,
       error: null,
     };
   } catch (error) {
     console.error("Error updating mentor:", error);
-    return { error: "Failed to update mentor profile", mentor: null };
+    return {
+      error: error instanceof Error ? error.message : "Failed to update mentor profile",
+      mentor: null
+    };
   }
 };

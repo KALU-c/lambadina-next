@@ -21,16 +21,16 @@ export type MentorWithUser = {
     id: number;
     type: "BASIC" | "STANDARD" | "PREMIUM";
     price: number;
-    // createdAt: Date;
   }[];
 } & {
   user: {
     firstName: string | null;
     lastName: string | null;
     profilePicture: string | null;
+    email: string | null;
+    phoneNumber: string | null;
   };
 };
-
 
 type PricingProps = {
   ref: React.RefObject<null | HTMLDivElement>
@@ -76,10 +76,20 @@ export const pricingTabs = [
   }
 ];
 
-
 const Pricing = ({ ref, mentor }: PricingProps) => {
   const { isAuthenticated, user } = useAuth();
   const [txRef, setTxRef] = useState("");
+
+  const isProfileComplete = () => {
+    console.log(user);
+    if (!user) return false;
+    return Boolean(
+      user.first_name &&
+      user.last_name &&
+      user.email &&
+      user.phone_number
+    );
+  };
 
   return (
     <Tabs defaultValue="BASIC" ref={ref}>
@@ -88,7 +98,6 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
         <TabsTrigger value="STANDARD">Standard</TabsTrigger>
         <TabsTrigger value="PREMIUM">Premium</TabsTrigger>
       </TabsList>
-
 
       {pricingTabs.map(pricing => (
         <TabsContent key={pricing.value} value={pricing.value} className="font-light flex flex-col gap-4 rounded-b-xl">
@@ -111,31 +120,28 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
           <form method="POST" action="https://api.chapa.co/v1/hosted/pay">
             <input type="hidden" name="public_key" value={process.env.NEXT_PUBLIC_CHAPA_PUBLIC_API_KEY} />
             <input type="hidden" name="tx_ref" value={txRef} onSubmit={() => setTxRef(nanoid())} />
-            {/* make this dynamic */}
             <input type="hidden" name="amount" value={mentor.pricing.find(price => price.type === pricing.value)?.price} />
             <input type="hidden" name="currency" value="ETB" />
-            <input type="hidden" name="email" value="endekaluzemenu2134@gmail.com" />
-            <input type="hidden" name="first_name" value="Endekalu" />
-            <input type="hidden" name="last_name" value="Zemenu" />
+            <input type="hidden" name="email" value={user?.email || ""} />
+            <input type="hidden" name="first_name" value={user?.first_name || ""} />
+            <input type="hidden" name="last_name" value={user?.last_name || ""} />
             <input type="hidden" name="title" value="Mentorship" />
-            <input type="hidden" name="description" value="lorem" />
+            <input type="hidden" name="description" value={`${pricing.label} mentorship session`} />
             <input type="hidden" name="callback_url" value="" />
             <input type="hidden" name="return_url" value={process.env.NEXT_PUBLIC_BASE_URL} />
 
             {isAuthenticated ? (
-              <>
-                {(user?.first_name || user?.last_name) ? (
+              isProfileComplete() ? (
+                <Button size={'xlg'} className="text-black w-full">
+                  Book Now
+                </Button>
+              ) : (
+                <Link href={'/profile'} onClick={() => toast.info('Please complete your profile (name, email, and phone number) to book a session')}>
                   <Button size={'xlg'} className="text-black w-full">
                     Book Now
                   </Button>
-                ) : (
-                  <Link href={'/profile'} onClick={() => toast.info('Please complete your profile to book a session')}>
-                    <Button size={'xlg'} className="text-black w-full" onClick={() => console.log(user)}>
-                      Book Now
-                    </Button>
-                  </Link>
-                )}
-              </>
+                </Link>
+              )
             ) : (
               <Link href={'/login'}>
                 <Button size={'xlg'} className="text-black w-full">
@@ -144,50 +150,9 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
               </Link>
             )}
           </form>
-
-
         </TabsContent>
       ))}
-
-
-      {/* <TabsContent value="standard" className="font-light flex flex-col gap-4 rounded-b-xl">
-        <p className="text-lg">
-          Perfect for young professionals and graduates ready to advance their career with guided support.
-        </p>
-
-        <ul className="list-disc pl-8 py-2">
-          <li>Two group mentorship sessions every quarter</li>
-          <li>Two one-on-one mentorship sessions per month</li>
-          <li>Full access to mentorship resources and exclusive webinars</li>
-          <li>Priority certification and completion badge</li>
-          <li>Affordable pricing for early-career professionals</li>
-        </ul>
-
-        <Button size={'xlg'} className="text-black hover:bg-[]">
-          Book Now
-        </Button>
-      </TabsContent>
-
-      <TabsContent value="premium" className="font-light flex flex-col gap-4 rounded-b-xl">
-        <p className="text-lg">
-          Tailored for experienced professionals or entrepreneurs seeking elite-level mentorship and networking.
-        </p>
-
-        <ul className="list-disc pl-8 py-2">
-          <li>Monthly private strategy sessions with top mentors</li>
-          <li>Unlimited one-on-one mentorship sessions</li>
-          <li>Full access to premium resources, masterclasses, and workshops</li>
-          <li>Exclusive invitations to networking events</li>
-          <li>Priority support and personal mentorship concierge</li>
-        </ul>
-
-        <Button size={'xlg'} className="text-black">
-          Book Now
-        </Button>
-      </TabsContent> */}
-
     </Tabs>
-
   )
 }
 

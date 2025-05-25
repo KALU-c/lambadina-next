@@ -118,7 +118,7 @@ const Profile = () => {
   const { t } = useTranslation()
   const router = useRouter()
 
-  const { user, accessToken } = useAuth();
+  const { user, accessToken, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -246,8 +246,17 @@ const Profile = () => {
 
           if (mentor) {
             toast.success("Mentor profile updated successfully!");
-            // Store the updated mentor data in localStorage if needed
-            localStorage.setItem("mentor", JSON.stringify(mentor));
+            setUser({
+              id: mentor.userId,
+              username: mentor.user.username,
+              email: mentor.user.email,
+              first_name: mentor.user.firstName,
+              last_name: mentor.user.lastName,
+              phone_number: mentor.user.phoneNumber,
+              user_type: "mentor",
+              profile_picture: mentor.user.profilePicture,
+              is_verified: mentor.user.isVerified
+            });
             setIsEditing(false);
 
             // Update form values with the returned data
@@ -294,7 +303,8 @@ const Profile = () => {
 
         if (updatedUser) {
           toast.success("Profile updated successfully!");
-          localStorage.setItem("user", JSON.stringify(updatedUser));
+          // localStorage.setItem("user", JSON.stringify(updatedUser));
+          setUser(updatedUser);
           setIsEditing(false);
         } else {
           toast.error("Failed to update profile.");

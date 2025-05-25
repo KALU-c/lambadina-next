@@ -6,7 +6,7 @@ import { z } from "zod";
 
 type UserTypePrisma = "client" | "admin" | "mentor"
 
-export interface UserType {
+export type UserType = {
   id: number;
   username: string;
   email: string | null;
