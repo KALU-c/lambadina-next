@@ -33,11 +33,25 @@ export const registerUser = async (userData: z.infer<typeof registerSchema>) => 
 			}
 		});
 
-		await prisma.client.create({
-			data: {
-				userId: user.id
-			}
-		})
+		if (user.userType === "client") {
+			await prisma.client.create({
+				data: {
+					userId: user.id
+				}
+			})
+		}
+
+		if (user.userType === "client") {
+			await prisma.mentor.create({
+				data: {
+					bio: '',
+					rating: 0,
+					totalSessions: 0,
+					userId: user.id,
+					isAvailable: true
+				}
+			})
+		}
 
 		return { user, error: null };
 	} catch (error) {
