@@ -24,6 +24,7 @@ export type MentorWithUser = {
   }[];
 } & {
   user: {
+    id: number
     firstName: string | null;
     lastName: string | null;
     profilePicture: string | null;
@@ -125,10 +126,15 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
             <input type="hidden" name="email" value={user?.email || ""} />
             <input type="hidden" name="first_name" value={user?.first_name || ""} />
             <input type="hidden" name="last_name" value={user?.last_name || ""} />
+            <input type="hidden" name="phone_number" value={user?.phone_number || ""} />
             <input type="hidden" name="title" value="Mentorship" />
             <input type="hidden" name="description" value={`${pricing.label} mentorship session`} />
             <input type="hidden" name="callback_url" value="" />
             <input type="hidden" name="return_url" value={process.env.NEXT_PUBLIC_BASE_URL} />
+            <input type="hidden" name="meta[client_user_id]" value={user?.id} />
+            <input type="hidden" name="meta[mentor_id]" value={mentor.id} />
+            <input type="hidden" name="meta[mentor_user_id]" value={mentor.user.id} />
+            <input type="hidden" name="meta[mentor_name]" value={`${mentor.user.firstName ?? ""} ${mentor.user.lastName ?? ""}`} />
 
             {isAuthenticated ? (
               isProfileComplete() ? (
