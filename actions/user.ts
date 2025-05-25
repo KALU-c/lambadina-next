@@ -41,7 +41,7 @@ export const registerUser = async (userData: z.infer<typeof registerSchema>) => 
 			})
 		}
 
-		if (user.userType === "client") {
+		if (user.userType === "mentor") {
 			await prisma.mentor.create({
 				data: {
 					bio: '',
