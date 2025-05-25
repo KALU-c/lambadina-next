@@ -25,14 +25,12 @@ const HomeLayout = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Reset scroll position to the beginning when component mounts
   useEffect(() => {
     if (tabsListRef.current) {
       tabsListRef.current.scrollLeft = 0
     }
   }, [])
 
-  // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -42,65 +40,67 @@ const HomeLayout = () => {
         ])
 
         if (mentorsData.length === 0) {
-          toast.error("")
+          toast.error(t("no_mentors_found"))
           return;
         }
 
         setMentors(mentorsData)
         setCategories(categoriesData)
-      } catch {
-        console.error('Failed to fetch mentors or categories')
+      } catch (error) {
+        console.error('Failed to fetch mentors or categories:', error)
+        toast.error(t("fetch_error"))
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [])
+  }, [t])
 
-  // Filter mentors based on search query and active tab
   const filteredMentors = useMemo(() => {
     let results = mentors
 
+    // Filter by tab selection
     if (activeTab === 'top-experts') {
       results = results.filter(mentor => mentor.rating >= 4.5)
     } else if (activeTab === 'business-experts') {
       results = results.filter(mentor =>
-        mentor.categories.some((category: Category) =>
+        mentor.categories.some(category =>
           category.name.toLowerCase().includes('business')
         )
       )
     } else if (activeTab !== 'all-experts') {
       const categoryName = activeTab.split('-').join(' ')
       results = results.filter(mentor =>
-        mentor.categories.some((category: Category) =>
+        mentor.categories.some(category =>
           category.name.toLowerCase() === categoryName.toLowerCase()
         )
       )
     }
 
+    // Filter by search query
     if (search.trim()) {
       const searchLower = search.toLowerCase();
       results = results.filter(mentor =>
         (mentor.user.firstName?.toLowerCase() ?? "").includes(searchLower) ||
         (mentor.user.lastName?.toLowerCase() ?? "").includes(searchLower) ||
         mentor.bio.toLowerCase().includes(searchLower) ||
-        mentor.categories.some((category: Category) =>
+        mentor.categories.some(category =>
           category.name.toLowerCase().includes(searchLower)
         )
       );
     }
 
     return results
-  }, [search, activeTab, mentors])
+  }, [search, activeTab, mentors, t])
 
-  // Group mentors by their primary category
+  // Group mentors by their primary category (first category in their list)
   const groupedMentors = useMemo(() => {
     const groups: Record<string, MentorProfile[]> = {}
 
     categories.forEach(category => {
       const categoryMentors = mentors.filter(mentor =>
-        mentor.categories[0]?.name === category.name
+        mentor.categories.some(c => c.id === category.id)
       )
       if (categoryMentors.length > 0) {
         groups[category.name] = categoryMentors
@@ -133,7 +133,7 @@ const HomeLayout = () => {
   if (loading) {
     return (
       <div className="py-12 text-center text-gray-500 text-lg">
-        Loading mentors...
+        {t("loading")}...
       </div>
     )
   }
@@ -147,10 +147,7 @@ const HomeLayout = () => {
           <ExpertsCarousel />
 
           <div>
-            <Tabs
-              defaultValue="all-experts"
-              onValueChange={(value) => setActiveTab(value)}
-            >
+            <Tabs defaultValue="all-experts" onValueChange={setActiveTab}>
               <TabsList ref={tabsListRef} className="flex items-center justify-start bg-transparent overflow-x-auto whitespace-nowrap max-w-full scrollbar-thin">
                 <TabsTrigger value="all-experts">{t('all_mentors')}</TabsTrigger>
                 <TabsTrigger value="top-experts">{t('top_mentors')}</TabsTrigger>
@@ -160,7 +157,7 @@ const HomeLayout = () => {
                     key={category.id}
                     value={category.name.toLowerCase().split(' ').join('-')}
                   >
-                    {category.name}
+                    {category.name} ({category.mentors?.length || 0})
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -193,7 +190,7 @@ const HomeLayout = () => {
                   text="business_experts_text"
                 />
                 {renderMentorsList(mentors.filter(mentor =>
-                  mentor.categories.some((category: Category) =>
+                  mentor.categories.some(category =>
                     category.name.toLowerCase().includes('business')
                   )
                 ))}
@@ -211,13 +208,12 @@ const HomeLayout = () => {
                     text={category.description}
                   />
                   {renderMentorsList(
-                    mentors.filter((mentor: MentorProfile) =>
-                      mentor.categories.some((c: Category) => c.name === category.name)
+                    mentors.filter(mentor =>
+                      mentor.categories.some(c => c.id === category.id)
                     )
                   )}
                 </TabsContent>
               ))}
-
             </Tabs>
           </div>
 
@@ -231,20 +227,13 @@ const HomeLayout = () => {
                     mainText={categoryName}
                     text={categories.find(c => c.name === categoryName)?.description || ''}
                   />
-                  <div className="flex flex-row gap-6 overflow-x-auto scrollbar-hide py-2 -mx-[22px] px-[22px]">
-                    {mentors.map(mentor => (
-                      <Suspense key={mentor.id} fallback={<ExpertsCardSkeleton />}>
-                        <ExpertsCard mentor={mentor} />
-                      </Suspense>
-                    ))}
-                  </div>
+                  {renderMentorsList(mentors)}
                 </div>
               ))}
             </>
           )}
 
           <Separator orientation="horizontal" className="border" />
-
           <CTA />
         </>
       ) : (
@@ -255,8 +244,7 @@ const HomeLayout = () => {
                 className="pb-6"
                 highlightMainText={false}
                 mainText="search_results_title"
-                text={t("search_results_text", { count: filteredMentors.length, query: search })
-                }
+                text={t("search_results_text", { count: filteredMentors.length, query: search })}
               />
               {renderMentorsGrid(filteredMentors)}
             </>

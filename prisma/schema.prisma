@@ -82,9 +82,7 @@ model Category {
   description String
   createdAt   DateTime @default(now()) @map("created_at")
 
-  mentorCategories MentorCategory[]
-  mentor           Mentor?          @relation(fields: [mentorId], references: [id], onDelete: Cascade)
-  mentorId         Int?
+  mentors MentorCategory[]
 }
 
 model Mentor {
@@ -97,12 +95,21 @@ model Mentor {
   updatedAt     DateTime @updatedAt @map("updated_at")
   userId        Int      @unique @map("user_id")
 
-  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  mentorCategories MentorCategory[]
-  availabilities   MentorAvailability[]
-  booking          Booking[]
-  categories       Category[]
-  pricing          MentorPricing[]
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories     MentorCategory[]
+  availabilities MentorAvailability[]
+  booking        Booking[]
+  pricing        MentorPricing[]
+}
+
+model MentorCategory {
+  id         Int      @id @default(autoincrement())
+  mentorId   Int      @map("mentor_id")
+  categoryId Int      @map("category_id")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  mentor     Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+
+  @@unique([mentorId, categoryId])
 }
 
 enum PricingType {
@@ -123,15 +130,15 @@ model MentorPricing {
   @@map("mentor_pricings")
 }
 
-model MentorCategory {
-  id         Int      @id @default(autoincrement())
-  mentorId   Int      @map("mentor_id")
-  categoryId Int      @map("category_id")
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  mentor     Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+// model MentorCategory {
+//   id         Int      @id @default(autoincrement())
+//   mentorId   Int      @map("mentor_id")
+//   categoryId Int      @map("category_id")
+//   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+//   mentor     Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
 
-  @@unique([mentorId, categoryId])
-}
+//   @@unique([mentorId, categoryId])
+// }
 
 model MentorAvailability {
   id          Int      @id @default(autoincrement())

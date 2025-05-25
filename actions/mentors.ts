@@ -5,11 +5,11 @@ import { verifyToken } from "./user";
 import { revalidatePath } from "next/cache";
 import { PricingType } from "@/types";
 
+// Updated getMentors to properly include categories through the join table
 export const getMentors = async () => {
   try {
     const mentors = await prisma.mentor.findMany({
-      select: {
-        id: true,
+      include: {
         user: {
           select: {
             id: true,
@@ -23,49 +23,38 @@ export const getMentors = async () => {
             isVerified: true
           }
         },
-        bio: true,
         categories: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            createdAt: true
+          include: {
+            category: {
+              include: {
+                mentors: true
+              }
+            }
           }
         },
-        pricing: {
-          select: {
-            id: true,
-            type: true,
-            price: true,
-            createdAt: true
-          }
-        },
-        isAvailable: true,
-        rating: true,
-        totalSessions: true,
-        availabilities: {
-          select: {
-            id: true,
-            dayOfWeek: true,
-            startTime: true,
-            endTime: true,
-            isAvailable: true,
-            mentorId: true
-          }
-        },
-        createdAt: true,
-        updatedAt: true
+        pricing: true,
+        availabilities: true
+      },
+      orderBy: {
+        rating: 'desc'
       }
     });
 
-    return { mentors, error: "" }
+    // Map the data to include categories directly in the response
+    const formattedMentors = mentors.map(mentor => ({
+      ...mentor,
+      categories: mentor.categories.map(mc => mc.category)
+    }));
+
+    return { mentors: formattedMentors, error: "" };
   } catch (error) {
     console.log(error);
-    return { mentors: [], error: "Error fetching mentors" }
+    return { mentors: [], error: "Error fetching mentors" };
   }
 }
 
 
+// Updated getMentor to include categories through join table
 export const getMentor = async (id: string, token?: string) => {
   try {
     let decoded: {
@@ -81,26 +70,28 @@ export const getMentor = async (id: string, token?: string) => {
     const mentor = await prisma.mentor.findUnique({
       where: { id: parseInt(id) || decoded?.userId },
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            profilePicture: true,
-            phoneNumber: true,
-            username: true,
-            email: true,
+        user: true,
+        pricing: true,
+        categories: {
+          include: {
+            category: true
           }
         },
-        pricing: {
-          select: {
-            id: true,
-            price: true,
-            type: true
-          }
-        }
+        availabilities: true
       }
     });
-    return { mentor, error: "" };
+
+    if (!mentor) {
+      return { mentor: null, error: "Mentor not found" };
+    }
+
+    // Format the data to include categories directly
+    const formattedMentor = {
+      ...mentor,
+      categories: mentor.categories.map(mc => mc.category)
+    };
+
+    return { mentor: formattedMentor, error: "" };
   } catch (error) {
     console.error(error);
     return { mentor: null, error: "Error fetching mentor detail" };
@@ -164,7 +155,7 @@ export const updateMentor = async (
       include: {
         user: true,
         pricing: true,
-        mentorCategories: {
+        categories: {
           include: {
             category: true,
           },
@@ -236,7 +227,7 @@ export const updateMentor = async (
       include: {
         user: true,
         pricing: true,
-        mentorCategories: {
+        categories: {
           include: {
             category: true,
           },
@@ -248,7 +239,7 @@ export const updateMentor = async (
       mentor: result
         ? {
           ...result,
-          categories: result.mentorCategories.map((mc) => mc.category),
+          categories: result.categories.map((mc) => mc.category),
         }
         : null,
       error: null,

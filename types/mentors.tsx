@@ -17,6 +17,11 @@ export type Category = {
 	name: string;
 	description: string;
 	createdAt: Date; // ISO date string
+	mentors: {
+		id: number;
+		mentorId: number;
+		categoryId: number;
+	}[];
 };
 
 export type Availability = {
