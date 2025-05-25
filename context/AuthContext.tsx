@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { registerSchema } from "@/schema/registerSchema";
 import { AuthContext, type UserType } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { fetchUser, loginUser, registerUser } from "@/actions/user";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     removeLocalStorageItem("accessToken");
     removeLocalStorageItem("refreshToken");
     removeLocalStorageItem("user");
-    return router.replace("/login");
+    redirect("/login");
   };
 
   const isAuthenticated = !!accessToken;

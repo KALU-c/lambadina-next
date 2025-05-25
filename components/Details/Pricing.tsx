@@ -287,7 +287,7 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
         throw new Error('Pricing not found');
       }
 
-      const response = await axios.post('/api/payment/initiate', {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/initiate`, {
         amount: price,
         currency: 'ETB',
         email: user.email,

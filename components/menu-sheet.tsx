@@ -63,12 +63,10 @@ const MenuSheet = () => {
           <SheetFooter className="flex flex-col gap-3">
             <ChangeLanguage />
             {isAuthenticated ? (
-              <Link href={'/login'} onClick={logout}>
-                <Button className="w-full justify-start" size={'lg'}>
-                  <LogOut />
-                  {t('logout')}
-                </Button>
-              </Link>
+              <Button className="w-full justify-start" size={'lg'} onClick={logout}>
+                <LogOut />
+                {t('logout')}
+              </Button>
             ) : (
               <>
                 <Link href={'/login'}>
