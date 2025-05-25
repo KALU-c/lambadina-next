@@ -98,6 +98,49 @@ export const getMentor = async (id: string, token?: string) => {
   }
 };
 
+export const getMentorByAccessToken = async (token: string) => {
+  try {
+    let decoded: {
+      userId: number;
+      iat: number;
+      exp: number;
+    } | null = null;
+
+    if (token) {
+      decoded = await verifyToken(token);
+    }
+
+    const mentor = await prisma.mentor.findUnique({
+      where: { id: decoded?.userId },
+      include: {
+        user: true,
+        pricing: true,
+        categories: {
+          include: {
+            category: true
+          }
+        },
+        availabilities: true
+      }
+    });
+
+    if (!mentor) {
+      return { mentor: null, error: "Mentor not found" };
+    }
+
+    // Format the data to include categories directly
+    const formattedMentor = {
+      ...mentor,
+      categories: mentor.categories.map(mc => mc.category)
+    };
+
+    return { mentor: formattedMentor, error: "" };
+  } catch (error) {
+    console.error(error);
+    return { mentor: null, error: "Error fetching mentor detail" };
+  }
+};
+
 
 export const updateMentor = async (
   token: string,

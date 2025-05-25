@@ -1,3 +1,5 @@
+import { MentorProfile } from "./mentors";
+
 export type BookingStatus =
 	| 'PENDING'
 	| 'CONFIRMED'
@@ -25,23 +27,14 @@ export type Booking = {
 	mentorId: number;
 	client?: {
 		id: number;
-		firstName: string;
-		lastName: string;
-		email: string;
-		user: User
-	};
-	mentor?: {
-		id: number;
 		user: {
-			id: number;
-			firstName: string;
-			lastName: string;
-			profilePicture: string | null;
-		};
+			id: number,
+			firstName: string | null
+			lastName: string | null
+		}
 	};
 };
 
-// types/user.ts
 export enum UserType {
 	MENTOR = "mentor",
 	CLIENT = "client",

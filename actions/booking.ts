@@ -11,10 +11,15 @@ export const getBookingList = async (token: string) => {
 			return { bookings: null, error: "Error fetching user data" }
 		}
 
+
 		const bookings = await prisma.booking.findMany({
-			where: { mentorId: decoded.userId }
+			where: {
+				mentor: { userId: decoded.userId },
+			},
+			include: { client: { include: { user: true } }, mentor: false }
 		});
 
+		console.log(bookings)
 		return { bookings, error: "" }
 	} catch (error) {
 		console.error(error)
