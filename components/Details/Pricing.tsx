@@ -263,7 +263,6 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
     if (!user) return false;
     return Boolean(
       user.first_name &&
-      user.last_name &&
       user.email &&
       user.phone_number
     );
