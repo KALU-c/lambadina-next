@@ -304,7 +304,17 @@ const Profile = () => {
         if (updatedUser) {
           toast.success("Profile updated successfully!");
           // localStorage.setItem("user", JSON.stringify(updatedUser));
-          setUser(updatedUser);
+          setUser({
+            id: updatedUser.id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            first_name: updatedUser.first_name,
+            last_name: updatedUser.last_name,
+            phone_number: updatedUser.phone_number,
+            user_type: "client",
+            profile_picture: updatedUser.profile_picture,
+            is_verified: updatedUser.is_verified
+          });
           setIsEditing(false);
         } else {
           toast.error("Failed to update profile.");
