@@ -257,6 +257,17 @@ const Profile = () => {
               profile_picture: mentor.user.profilePicture,
               is_verified: mentor.user.isVerified
             });
+            localStorage.setItem('user', JSON.stringify({
+              id: mentor.userId,
+              username: mentor.user.username,
+              email: mentor.user.email,
+              first_name: mentor.user.firstName,
+              last_name: mentor.user.lastName,
+              phone_number: mentor.user.phoneNumber,
+              user_type: "mentor",
+              profile_picture: mentor.user.profilePicture,
+              is_verified: mentor.user.isVerified
+            }))
             setIsEditing(false);
 
             // Update form values with the returned data
@@ -303,7 +314,17 @@ const Profile = () => {
 
         if (updatedUser) {
           toast.success("Profile updated successfully!");
-          // localStorage.setItem("user", JSON.stringify(updatedUser));
+          localStorage.setItem("user", JSON.stringify({
+            id: updatedUser.id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            first_name: updatedUser.first_name,
+            last_name: updatedUser.last_name,
+            phone_number: updatedUser.phone_number,
+            user_type: "client",
+            profile_picture: updatedUser.profile_picture,
+            is_verified: updatedUser.is_verified
+          }));
           setUser({
             id: updatedUser.id,
             username: updatedUser.username,

@@ -1,13 +1,13 @@
 import Navbar from '../Navbar'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
+// import { Input } from '../ui/input'
+// import { Button } from '../ui/button'
 import Footer from '../Footer'
 import HomeLayout from './HomeLayout'
-import i18next from 'i18next'
+// import i18next from 'i18next'
 
 const Home = () => {
   return (
-    <main className='pt-[10px] flex flex-col'>
+    <main className='pt-[10px] flex flex-col min-h-screen justify-between'>
       <div className='px-[22px] flex flex-col space-y-5 mb-10'>
         <Navbar />
         <HomeLayout />

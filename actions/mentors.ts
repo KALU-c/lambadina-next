@@ -9,6 +9,7 @@ import { PricingType } from "@/types";
 export const getMentors = async () => {
   try {
     const mentors = await prisma.mentor.findMany({
+      // where: { isAvailable: true },
       include: {
         user: {
           select: {
@@ -111,7 +112,7 @@ export const getMentorByAccessToken = async (token: string) => {
     }
 
     const mentor = await prisma.mentor.findUnique({
-      where: { id: decoded?.userId },
+      where: { userId: decoded?.userId },
       include: {
         user: true,
         pricing: true,

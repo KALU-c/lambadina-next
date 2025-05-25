@@ -11,7 +11,8 @@ const nextConfig: NextConfig = {
         pathname: '**'
       }
     ]
-  }
+  },
+  crossOrigin: 'anonymous'
 };
 
 export default nextConfig;

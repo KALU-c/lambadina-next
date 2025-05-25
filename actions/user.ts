@@ -33,6 +33,12 @@ export const registerUser = async (userData: z.infer<typeof registerSchema>) => 
 			}
 		});
 
+		await prisma.client.create({
+			data: {
+				userId: user.id
+			}
+		})
+
 		return { user, error: null };
 	} catch (error) {
 		console.error(error);

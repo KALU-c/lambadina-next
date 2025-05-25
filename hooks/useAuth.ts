@@ -4,7 +4,6 @@ import type { registerSchema } from "@/schema/registerSchema";
 import { createContext, useContext } from "react";
 import { z } from "zod";
 
-type UserTypePrisma = "client" | "admin" | "mentor"
 
 export type UserType = {
   id: number;
@@ -13,7 +12,7 @@ export type UserType = {
   first_name: string | null;
   last_name: string | null;
   phone_number: string | null;
-  user_type: UserTypePrisma;
+  user_type: "client" | "admin" | "mentor";
   profile_picture: string | null;
   is_verified: boolean;
 }

@@ -66,8 +66,8 @@ model UserUserPermission {
 
 model Client {
   id            Int      @id @default(autoincrement())
-  interests     String
-  totalSessions Int      @map("total_sessions")
+  interests     String?
+  totalSessions Int      @default(0) @map("total_sessions")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
   userId        Int      @unique @map("user_id")

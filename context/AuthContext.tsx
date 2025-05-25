@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     removeLocalStorageItem("accessToken");
     removeLocalStorageItem("refreshToken");
     removeLocalStorageItem("user");
-    router.replace("/login");
+    return router.replace("/login");
   };
 
   const isAuthenticated = !!accessToken;

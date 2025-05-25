@@ -33,7 +33,9 @@ const Dashboard = () => {
         const { bookings: allBookings, error } = await getBookingList(accessToken ?? "");
         const { mentor: mentorData, error: mentorDataError } = await getMentorByAccessToken(accessToken ?? "");
 
-        if (error || mentorDataError) {
+        if ((!bookings || !mentor) && (error !== "" || mentorDataError !== "")) {
+          toast.error(error)
+          toast.error(mentorDataError)
           return;
         }
 
