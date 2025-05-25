@@ -46,8 +46,6 @@ const Dashboard = () => {
           setBooked(filterBooked);
           setBookings(filterPending);
 
-          console.log(filterPending)
-
           const totalMentorEarnings = filterBooked.reduce((total, booking) => {
             return total + booking.mentorPayout;
           }, 0);

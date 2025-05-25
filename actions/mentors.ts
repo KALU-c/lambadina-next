@@ -161,8 +161,6 @@ export const updateMentor = async (
     // Verify the user token
     const decoded = await verifyToken(token);
 
-    console.log(decoded)
-
     if (!decoded?.userId) {
       return { error: "Unauthorized", mentor: null };
     }

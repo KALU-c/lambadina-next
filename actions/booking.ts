@@ -19,7 +19,6 @@ export const getBookingList = async (token: string) => {
 			include: { client: { include: { user: true } }, mentor: false }
 		});
 
-		console.log(bookings)
 		return { bookings, error: "" }
 	} catch (error) {
 		console.error(error)

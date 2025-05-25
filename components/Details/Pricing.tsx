@@ -82,7 +82,6 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
   const [txRef, setTxRef] = useState("");
 
   const isProfileComplete = () => {
-    console.log(user);
     if (!user) return false;
     return Boolean(
       user.first_name &&

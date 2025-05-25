@@ -14,12 +14,10 @@ interface ProfilePictureProps {
 export default function ProfilePicture({ profileURL, setProfileURL, isEditing, isLoading }: ProfilePictureProps) {
 
 	const handleUpload = (result: CloudinaryUploadWidgetResults) => {
-		// console.log("Upload Result:", result);
 
 		if (result.info && typeof result.info !== "string") {
 			const uploadedUrl = result.info.secure_url;
 			setProfileURL(uploadedUrl);
-			// onUpload(uploadedUrl);
 		}
 	};
 
