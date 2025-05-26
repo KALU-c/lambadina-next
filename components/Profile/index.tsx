@@ -412,12 +412,12 @@ const Profile = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* Profile Picture and Bio */}
             <div className="pt-4">
-              <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
+              <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center justify-center">
                 <User2 size={18} />
                 {t("profile_picture_and_bio")}
               </div>
 
-              <div className="flex flex-col space-y-4">
+              <div className="flex flex-col space-y-4 items-center justify-center">
 
                 <ProfilePicture
                   isEditing={isEditing}

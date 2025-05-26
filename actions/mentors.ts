@@ -8,7 +8,7 @@ import { PricingType } from "@/types";
 export const getMentors = async () => {
   try {
     const mentors = await prisma.mentor.findMany({
-      where: { isAvailable: true },
+      where: { isAvailable: true, user: { profilePicture: { not: null } }, pricing: { some: {} } },
       include: {
         user: {
           select: {

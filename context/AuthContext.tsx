@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      await login(values.username, values.password);
+      await login(values.username, values.password, true);
     } catch (err) {
       console.error(err);
       if (err instanceof AxiosError) {
@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string, newUser?: boolean) => {
     setIsLoading(true);
     try {
       const { token, message } = await loginUser(username, password);
@@ -118,7 +118,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // setLocalStorageItem("refreshToken", refresh);
 
       toast.success("Logged in successfully 🎉");
-      router.replace("/");
+      if (newUser) {
+        router.replace("/profile");
+        toast.info("Complete your profile to access the platform's full features.")
+      } else {
+        router.replace('/');
+      }
     } catch (err) {
       console.error(err);
       toast.error("Invalid credentials. Please try again.");
