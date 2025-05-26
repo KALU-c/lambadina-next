@@ -15,6 +15,8 @@ const DetailsNavbar = () => {
             className="h-6 w-full object-contain"
             height={24}
             width={40}
+            unoptimized
+            priority
           />
         </div>
       </Link>

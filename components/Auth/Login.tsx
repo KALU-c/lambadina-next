@@ -47,7 +47,15 @@ const Login = () => {
 
         <Card>
           <CardHeader className="flex flex-col gap-8 items-center justify-center">
-            <Image src="/logo.png" alt="lambadina logo" className="h-8 w-full object-contain text-center" width={100} height={50} />
+            <Image
+              src="/logo.png"
+              alt="lambadina logo"
+              className="h-8 w-full object-contain text-center"
+              width={100}
+              height={50}
+              unoptimized
+              priority
+            />
 
             <div className="flex flex-col">
               <p className="text-center text-2xl">{t("login_welcome_back")}</p>

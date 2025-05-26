@@ -12,6 +12,8 @@ const Navbar = () => {
           className="h-6 w-full object-contain"
           width={50}
           height={20}
+          unoptimized
+          priority
         />
       </Link>
 
