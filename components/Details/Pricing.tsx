@@ -194,8 +194,8 @@ export type MentorWithUser = {
   pricing: {
     id: number;
     type: "BASIC" | "STANDARD" | "PREMIUM";
-    description?: string;
-    benefits?: string;
+    description: string | null;
+    benefits: string | null;
     price: number;
   }[];
 } & {
