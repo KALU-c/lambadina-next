@@ -119,12 +119,14 @@ enum PricingType {
 }
 
 model MentorPricing {
-  id        Int         @id @default(autoincrement())
-  type      PricingType
-  price     Float
-  mentorId  Int         @map("mentor_id")
-  createdAt DateTime    @default(now()) @map("created_at")
-  mentor    Mentor      @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  id          Int         @id @default(autoincrement())
+  type        PricingType
+  price       Float
+  description String?     @db.Text
+  benefits    String?     @db.Text
+  mentorId    Int         @map("mentor_id")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  mentor      Mentor      @relation(fields: [mentorId], references: [id], onDelete: Cascade)
 
   @@unique([mentorId, type], name: "mentor_pricing_unique")
   @@map("mentor_pricings")

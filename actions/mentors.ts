@@ -5,11 +5,10 @@ import { verifyToken } from "./user";
 import { revalidatePath } from "next/cache";
 import { PricingType } from "@/types";
 
-// Updated getMentors to properly include categories through the join table
 export const getMentors = async () => {
   try {
     const mentors = await prisma.mentor.findMany({
-      // where: { isAvailable: true },
+      where: { isAvailable: true },
       include: {
         user: {
           select: {
@@ -54,8 +53,6 @@ export const getMentors = async () => {
   }
 }
 
-
-// Updated getMentor to include categories through join table
 export const getMentor = async (id: string, token?: string) => {
   try {
     let decoded: {
@@ -142,7 +139,6 @@ export const getMentorByAccessToken = async (token: string) => {
   }
 };
 
-
 export const updateMentor = async (
   token: string,
   data: {
@@ -153,20 +149,24 @@ export const updateMentor = async (
     basicPrice: string;
     standardPrice: string;
     premiumPrice: string;
+    basicDescription?: string;
+    basicPlanBenefits?: string;
+    standardDescription?: string;
+    standardPlanBenefits?: string;
+    premiumDescription?: string;
+    premiumPlanBenefits?: string;
     is_available: boolean;
     profilePicture?: string;
     categories?: number[];
   }
 ) => {
   try {
-    // Verify the user token
     const decoded = await verifyToken(token);
 
     if (!decoded?.userId) {
       return { error: "Unauthorized", mentor: null };
     }
 
-    // First check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { id: decoded.userId }
     });
@@ -175,16 +175,13 @@ export const updateMentor = async (
       return { error: "User not found", mentor: null };
     }
 
-    // Validate required fields
     if (!data.fullName || !data.email) {
       return { error: "Full name and email are required", mentor: null };
     }
 
-    // Split full name into first and last names
     const [firstName, ...lastNameParts] = data.fullName.split(" ");
     const lastName = lastNameParts.join(" ");
 
-    // Update user data
     const updatedUser = await prisma.user.update({
       where: { id: decoded.userId },
       data: {
@@ -196,12 +193,10 @@ export const updateMentor = async (
       },
     });
 
-    // Check if mentor exists
     const existingMentor = await prisma.mentor.findUnique({
       where: { userId: updatedUser.id }
     });
 
-    // Update or create mentor data
     const updatedMentor = await prisma.mentor.upsert({
       where: { userId: updatedUser.id },
       update: {
@@ -226,23 +221,27 @@ export const updateMentor = async (
       },
     });
 
-    // Validate and parse prices
     const pricingUpdates = [
       {
         type: "BASIC" as PricingType,
         price: parseFloat(data.basicPrice) || 0,
+        description: data.basicDescription || "",
+        benefits: data.basicPlanBenefits || ""
       },
       {
         type: "STANDARD" as PricingType,
         price: parseFloat(data.standardPrice) || 0,
+        description: data.standardDescription || "",
+        benefits: data.standardPlanBenefits || ""
       },
       {
         type: "PREMIUM" as PricingType,
         price: parseFloat(data.premiumPrice) || 0,
+        description: data.premiumDescription || "",
+        benefits: data.premiumPlanBenefits || ""
       },
     ];
 
-    // Upsert all pricing types with error handling
     await Promise.all(
       pricingUpdates.map((pricing) =>
         prisma.mentorPricing.upsert({
@@ -254,11 +253,15 @@ export const updateMentor = async (
           },
           update: {
             price: pricing.price,
+            description: pricing.description,
+            benefits: pricing.benefits
           },
           create: {
             mentorId: updatedMentor.id,
             type: pricing.type,
             price: pricing.price,
+            description: pricing.description,
+            benefits: pricing.benefits
           },
         }).catch(error => {
           console.error(`Error updating ${pricing.type} pricing:`, error);

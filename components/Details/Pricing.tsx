@@ -194,6 +194,8 @@ export type MentorWithUser = {
   pricing: {
     id: number;
     type: "BASIC" | "STANDARD" | "PREMIUM";
+    description?: string;
+    benefits?: string;
     price: number;
   }[];
 } & {
@@ -334,8 +336,8 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
 
       {pricingTabs.map(pricing => (
         <TabsContent key={pricing.value} value={pricing.value} className="font-light flex flex-col gap-4 rounded-b-xl">
-          <p className="text-lg">
-            {pricing.description}
+          <p className="text-lg text-center font-[400] capitalize">
+            {mentor.pricing.find(price => pricing.value === price.type)?.description ?? ''}
           </p>
 
           <p className="text-center font-semibold text-5xl tracking-tight">
@@ -344,11 +346,14 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
             <span className="text-xl font-medium lowercase"> / Min</span>
           </p>
 
-          <ul className="list-disc pl-8 py-2">
+          {/* <ul className="list-disc pl-8 py-2">
             {pricing.benefits.map((benefit, i) => (
               <li key={i}>{benefit}</li>
             ))}
-          </ul>
+          </ul> */}
+          <div className="pl-8 py-2">
+            {mentor.pricing.find(price => pricing.value === price.type)?.benefits ?? ''}
+          </div>
 
           <Button
             size={'xlg'}

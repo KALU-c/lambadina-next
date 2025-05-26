@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import DetailsNavbar from "../Details/layout/navbar";
 import Footer from "../Footer";
-import { Loader, User2 } from "lucide-react";
+import { ChevronRight, Loader, User2 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Form,
@@ -33,6 +33,7 @@ import { useRouter } from "next/navigation";
 import ProfilePicture from "./ProfilePicture";
 import { getMentor, getMentors, updateMentor } from "@/actions/mentors";
 import { MentorProfile } from "@/types/mentors";
+import { Separator } from "../ui/separator";
 
 // type UpdateMentorProfile = {
 //   user: {
@@ -100,12 +101,18 @@ const mentorProfileSchema = z.object({
   basicPrice: z.string().min(1, {
     message: i18n.t("zod_price_required"),
   }),
+  basicDescription: z.string().optional(),
+  basicPlanBenefits: z.string().optional(),
   standardPrice: z.string().min(1, {
     message: i18n.t("zod_price_required"),
   }),
+  standardDescription: z.string().optional(),
+  standardPlanBenefits: z.string().optional(),
   premiumPrice: z.string().min(1, {
     message: i18n.t("zod_price_required"),
   }),
+  premiumDescription: z.string().optional(),
+  premiumPlanBenefits: z.string().optional(),
   is_available: z.boolean(),
 });
 
@@ -136,8 +143,14 @@ const Profile = () => {
         email: "",
         bio: "",
         basicPrice: "",
+        basicDescription: "",
+        basicPlanBenefits: "",
         standardPrice: "",
+        standardDescription: "",
+        standardPlanBenefits: "",
         premiumPrice: "",
+        premiumDescription: "",
+        premiumPlanBenefits: "",
         is_available: true
       }
       : {
@@ -159,10 +172,16 @@ const Profile = () => {
           const { mentor: mentorData } = await getMentor(currentMentor?.id.toString() ?? '', accessToken ?? '');
 
           if (mentorData) {
-            // Extract prices for each type
+            // Extract prices and description for each type
             const basicPrice = mentorData.pricing.find(p => p.type === 'BASIC')?.price.toString() ?? '';
+            const basicDescription = mentorData.pricing.find(p => p.type === 'BASIC')?.description?.toString() ?? '';
+            const basicPlanBenefits = mentorData.pricing.find(p => p.type === 'BASIC')?.benefits?.toString() ?? '';
             const standardPrice = mentorData.pricing.find(p => p.type === 'STANDARD')?.price.toString() ?? '';
+            const standardDescription = mentorData.pricing.find(p => p.type === 'STANDARD')?.description?.toString() ?? '';
+            const standardPlanBenefits = mentorData.pricing.find(p => p.type === 'STANDARD')?.benefits?.toString() ?? '';
             const premiumPrice = mentorData.pricing.find(p => p.type === 'PREMIUM')?.price.toString() ?? '';
+            const premiumDescription = mentorData.pricing.find(p => p.type === 'PREMIUM')?.description?.toString() ?? '';
+            const premiumPlanBenefits = mentorData.pricing.find(p => p.type === 'PREMIUM')?.benefits?.toString() ?? '';
 
             setProfileURL(mentorData.user.profilePicture ?? '');
 
@@ -175,8 +194,14 @@ const Profile = () => {
               email: mentorData.user.email ?? '',
               bio: mentorData.bio ?? '',
               basicPrice,
+              basicDescription,
+              basicPlanBenefits,
               standardPrice,
+              standardDescription,
+              standardPlanBenefits,
               premiumPrice,
+              premiumDescription,
+              premiumPlanBenefits,
               is_available: mentorData.isAvailable ?? true,
             });
           }
@@ -236,8 +261,14 @@ const Profile = () => {
             email: mentorValue.email,
             bio: mentorValue.bio,
             basicPrice: mentorValue.basicPrice,
+            basicDescription: mentorValue.basicDescription,
+            basicPlanBenefits: mentorValue.basicPlanBenefits,
             standardPrice: mentorValue.standardPrice,
+            standardDescription: mentorValue.standardDescription,
+            standardPlanBenefits: mentorValue.standardPlanBenefits,
             premiumPrice: mentorValue.premiumPrice,
+            premiumDescription: mentorValue.premiumDescription,
+            premiumPlanBenefits: mentorValue.premiumPlanBenefits,
             is_available: mentorValue.is_available,
             profilePicture: profileURL,
             categories: [], // Add actual category IDs if you have them
@@ -282,8 +313,14 @@ const Profile = () => {
               email: mentor.user.email || '',
               bio: mentor.bio || '',
               basicPrice: mentor.pricing.find(p => p.type === 'BASIC')?.price.toString() || '',
+              basicDescription: mentor.pricing.find(p => p.type === 'BASIC')?.description?.toString() || '',
+              basicPlanBenefits: mentor.pricing.find(p => p.type === 'BASIC')?.benefits?.toString() || '',
               standardPrice: mentor.pricing.find(p => p.type === 'STANDARD')?.price.toString() || '',
+              standardDescription: mentor.pricing.find(p => p.type === 'STANDARD')?.description?.toString() || '',
+              standardPlanBenefits: mentor.pricing.find(p => p.type === 'STANDARD')?.benefits?.toString() || '',
               premiumPrice: mentor.pricing.find(p => p.type === 'PREMIUM')?.price.toString() || '',
+              premiumDescription: mentor.pricing.find(p => p.type === 'PREMIUM')?.description?.toString() || '',
+              premiumPlanBenefits: mentor.pricing.find(p => p.type === 'PREMIUM')?.benefits?.toString() || '',
               is_available: mentor.isAvailable,
             });
           }
@@ -389,25 +426,6 @@ const Profile = () => {
                   setProfileURL={setProfileURL}
                 />
 
-                {user?.user_type === "mentor" && (
-                  <FormField
-                    control={form.control}
-                    name="bio"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("bio")}</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            className="bg-zinc-100 h-52"
-                            disabled={!isEditing || isLoading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
               </div>
             </div>
 
@@ -502,87 +520,230 @@ const Profile = () => {
 
                 <div className="flex flex-col space-y-4">
                   {user?.user_type === "mentor" && (
-                    <div className="pt-4">
-                      <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
+                    <>
+                      <div className="pt-4">
+                        {/* <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
                         <User2 size={18} />
                         {t("pricing")}
-                      </div>
+                      </div> */}
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="basicPrice"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Basic Price (ETB/min)</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  className="bg-zinc-100 h-10"
-                                  disabled={!isEditing || isLoading}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="standardPrice"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Standard Price (ETB/min)</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  className="bg-zinc-100 h-10"
-                                  disabled={!isEditing || isLoading}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="premiumPrice"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Premium Price (ETB/min)</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  className="bg-zinc-100 h-10"
-                                  disabled={!isEditing || isLoading}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
+                            <ChevronRight size={18} />
+                            Basic Plan
+                          </span>
+                          <div className="mb-8 flex flex-col gap-4">
+                            <FormField
+                              control={form.control}
+                              name="basicPrice"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Basic Price (ETB/min)</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      className="bg-zinc-100 h-10"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="basicDescription"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Basic Plan Description</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      className="bg-zinc-100 h-10"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="basicPlanBenefits"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Basic Plan Benefits</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      className="bg-zinc-100 h-40"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
+                            <ChevronRight size={18} />
+                            Standard Plan
+                          </span>
+                          <div className="mb-8 flex flex-col gap-4">
+                            <FormField
+                              control={form.control}
+                              name="standardPrice"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Standard Price (ETB/min)</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      className="bg-zinc-100 h-10"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="standardDescription"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Standard Plan Description</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      className="bg-zinc-100 h-10"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="standardPlanBenefits"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Standard Plan Benefits</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      className="bg-zinc-100 h-40"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
+                            <ChevronRight size={18} />
+                            Premium Plan
+                          </span>
+                          <div className="mb-6 flex flex-col gap-4">
+                            <FormField
+                              control={form.control}
+                              name="premiumPrice"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Premium Price (ETB/min)</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      className="bg-zinc-100 h-10"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="premiumDescription"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Premium Plan Description</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      className="bg-zinc-100 h-10"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="premiumPlanBenefits"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Premium Plan Benefits</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      className="bg-zinc-100 h-40"
+                                      disabled={!isEditing || isLoading}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                      <FormField
+                        control={form.control}
+                        name="is_available"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between gap-4 bg-zinc-200 p-3 rounded-lg">
+                            <FormLabel className="text-md font-[400]">
+                              <ChevronRight size={18} />
+                              Accepting New Clients
+                            </FormLabel>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={!isEditing || isLoading}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="bio"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t("bio")}</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                className="bg-zinc-100 h-52"
+                                disabled={!isEditing || isLoading}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
                   )}
-                  <FormField
-                    control={form.control}
-                    name="is_available"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center gap-4">
-                        <FormLabel className="text-md">Available</FormLabel>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={!isEditing || isLoading}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+
                 </div>
               </div>
             )}
