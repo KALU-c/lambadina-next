@@ -314,7 +314,7 @@ const Pricing = ({ ref, mentor }: PricingProps) => {
 
 
       if (response.data?.chapaResponse?.data?.checkout_url) {
-        window.location.href = response.data.chapaResponse.data.checkout_url;
+        window.location.href = response.data.chapaResponse.data?.checkout_url;
       } else {
         throw new Error('Failed to initiate payment');
       }

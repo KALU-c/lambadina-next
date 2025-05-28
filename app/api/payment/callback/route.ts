@@ -155,11 +155,11 @@ async function verifyPayment(tx_ref: string) {
 			}
 		);
 
-		if (!response.ok) {
-			throw new Error(`Chapa API error: ${response.statusText}`);
+		if (!response?.ok) {
+			throw new Error(`Chapa API error: ${response?.statusText}`);
 		}
 
-		return await response.json();
+		return await response?.json();
 	} catch (error) {
 		console.error('Payment verification failed:', error);
 		return null;

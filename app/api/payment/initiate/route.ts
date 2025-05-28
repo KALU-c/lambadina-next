@@ -112,7 +112,7 @@ export async function POST(request: Request) {
 
 		return NextResponse.json({
 			message: 'Payment initiated successfully',
-			chapaResponse: response.data,
+			chapaResponse: response?.data,
 			booking: pendingBooking
 		})
 
