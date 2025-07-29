@@ -6,7 +6,7 @@ import AppWrapper from "@/components/app-wrapper";
 import { Toaster } from "sonner";
 
 const InterSans = Inter({
-  variable: "--font-inter-sans",
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
