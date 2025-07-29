@@ -9,8 +9,8 @@ const NavBarDesktop = () => {
 				Lambadina
 			</h1>
 			<div className="flex-center gap-4">
-				<p>Become a mentor</p>
-				<p>Contact us</p>
+				<Button variant={"link"} className="text-white">Become a mentor</Button>
+				<Button variant={"link"} className="text-white">Contact us</Button>
 				<Button variant={"ghost"}>Login</Button>
 				<Button>Sign Up</Button>
 			</div>
