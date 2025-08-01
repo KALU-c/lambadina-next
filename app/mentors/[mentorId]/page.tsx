@@ -1,11 +1,11 @@
 import Details from "@/components/Details"
 
 const MentorsDetail = async ({
-  params,
+	params,
 }: {
-  params: Promise<{ mentorId: string }>
+	params: Promise<{ mentorId: string }>
 }) => {
-	const { mentorId } = await params
+	const { mentorId } = await params;
 
 	return (
 		<Details mentorId={mentorId} />
