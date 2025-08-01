@@ -1,5 +1,5 @@
 import React from 'react'
-import NavBarDesktop from '../NavBarDesktop'
+import NavBarDesktop from '../components/NavBarDesktop'
 import Image from 'next/image'
 
 const Hero = () => {

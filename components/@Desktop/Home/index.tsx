@@ -1,13 +1,13 @@
-import NavBarDesktop from "../NavBarDesktop"
+import FooterDesktop from "../components/Footer"
 import CategoriesDesktop from "./Categories"
 import Hero from "./Hero"
 
 const HomeDesktop = () => {
 	return (
-		<main>
+		<main className="flex flex-col space-y-6">
 			<Hero />
 			<CategoriesDesktop />
-			<div className="min-h-dvh border border-t-red-500" />
+			<FooterDesktop />
 		</main>
 	)
 }
