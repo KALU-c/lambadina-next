@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import AppWrapper from "@/components/app-wrapper";
 import { Toaster } from "sonner";
+import ReactQueryProvider from "@/hooks/ReactQueryProvider";
 
 const InterSans = Inter({
   variable: "--font-inter",
@@ -34,12 +35,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={`${InterSans.className}`}>
-        <AuthProvider>
-          <AppWrapper>
-            {children}
-            <Toaster richColors />
-          </AppWrapper>
-        </AuthProvider>
+        <ReactQueryProvider>
+          <AuthProvider>
+            <AppWrapper>
+              {children}
+              <Toaster richColors />
+            </AppWrapper>
+          </AuthProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );
