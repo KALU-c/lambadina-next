@@ -20,38 +20,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { toast } from "sonner";
-// import type { MentorProfile } from "@/types/mentor";
 import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
-// import { AvatarUpload } from "./UploadImage";
 import Link from "next/link";
 import { fetchUser, updateUser } from "@/actions/user";
 import { useRouter } from "next/navigation";
-// import { CldImage, CldUploadButton } from 'next-cloudinary';
 import ProfilePicture from "./ProfilePicture";
 import { getMentor, getMentors, updateMentor } from "@/actions/mentors";
-import { MentorProfile } from "@/types/mentors";
-import { Separator } from "../ui/separator";
 
-// type UpdateMentorProfile = {
-//   user: {
-//     username?: string;
-//     email?: string;
-//     first_name?: string;
-//     last_name?: string;
-//     phone_number?: string;
-//     user_type?: string;
-//     profile_picture?: string | null;
-//   };
-//   bio: string;
-//   categories: number[];
-//   pricePerMinute: string;
-//   is_available: boolean;
-// };
-
-const clientProfileSchema = z.object({
+export const clientProfileSchema = z.object({
   fullName: z.string().min(2),
   username: z.string().min(2),
   phoneNumber: z.string().min(10),
@@ -59,30 +38,7 @@ const clientProfileSchema = z.object({
 });
 
 
-// const mentorProfileSchema = z.object({
-//   fullName: z.string().min(2, {
-//     message: i18n.t("zod_full_name_min"),
-//   }),
-//   username: z.string().min(2, {
-//     message: i18n.t("zod_username_min"),
-//   }),
-//   phoneNumber: z.string().min(10, {
-//     message: i18n.t("zod_phone_number_min"),
-//   }),
-//   email: z.string().email({
-//     message: i18n.t("zod_email_invalid"),
-//   }),
-//   bio: z.string().min(10, {
-//     message: i18n.t("zod_bio_min"),
-//   }),
-//   pricePerMinute: z.string().min(1, {
-//     message: i18n.t("zod_bio_min"),
-//   }),
-//   is_available: z.boolean(),
-// });
-
-// In your schema definitions
-const mentorProfileSchema = z.object({
+export const mentorProfileSchema = z.object({
   fullName: z.string().min(2, {
     message: i18n.t("zod_full_name_min"),
   }),
@@ -116,9 +72,9 @@ const mentorProfileSchema = z.object({
   is_available: z.boolean(),
 });
 
-type ClientProfileSchemaType = z.infer<typeof clientProfileSchema>
-type MentorProfileSchemaType = z.infer<typeof mentorProfileSchema>
-type CombinedProfileSchemaType = MentorProfileSchemaType | ClientProfileSchemaType;
+export type ClientProfileSchemaType = z.infer<typeof clientProfileSchema>
+export type MentorProfileSchemaType = z.infer<typeof mentorProfileSchema>
+export type CombinedProfileSchemaType = MentorProfileSchemaType | ClientProfileSchemaType;
 
 
 const Profile = () => {
@@ -185,7 +141,7 @@ const Profile = () => {
 
             setProfileURL(mentorData.user.profilePicture ?? '');
 
-            const fullName = `${mentorData.user?.firstName || ''} ${mentorData.user?.lastName || ''}`.trim();
+            const fullName = `${mentorData.user?.firstName ?? ''} ${mentorData.user?.lastName ?? ''}`.trim();
 
             form.reset({
               fullName,
@@ -221,7 +177,7 @@ const Profile = () => {
 
           setProfileURL(user.profile_picture ?? '');
 
-          const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+          const fullName = `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim();
 
           form.reset({
             fullName,
@@ -256,7 +212,7 @@ const Profile = () => {
 
         try {
           const { mentor, error } = await updateMentor(accessToken ?? '', {
-            fullName: `${first_name} ${last_name}`,
+            fullName: `${first_name ?? ""} ${last_name ?? ""}`,
             phoneNumber: mentorValue.phoneNumber,
             email: mentorValue.email,
             bio: mentorValue.bio,
