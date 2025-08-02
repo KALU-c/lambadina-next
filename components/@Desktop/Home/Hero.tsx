@@ -2,8 +2,12 @@ import React from 'react'
 import Image from 'next/image'
 import { Lightbulb } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
 
 const Hero = () => {
+	const { isAuthenticated } = useAuth();
+
 	return (
 		<section className='relative xl:px-[200px] lg:px-[150px] md:px-[50px] min-h-dvh text-white flex flex-col'>
 			<Image
@@ -23,8 +27,18 @@ const Hero = () => {
 				<div className="flex-center gap-4">
 					<Button variant={"link"} className="text-white">Become a mentor</Button>
 					<Button variant={"link"} className="text-white">Contact us</Button>
-					<Button variant={"ghost"}>Login</Button>
-					<Button>Sign Up</Button>
+					{!isAuthenticated ? (
+						<>
+							<Link href={"/login"}>
+								<Button variant={"ghost"}>Login</Button>
+							</Link>
+							<Link href={"/register"}>
+								<Button>Sign Up</Button>
+							</Link>
+						</>
+					): (
+						<Button variant={"outline"}>Dashboard</Button>
+					)}
 				</div>
 			</nav>
 			<div className='flex-1 h-full flex flex-col items-center justify-center gap-5'>

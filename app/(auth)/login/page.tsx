@@ -1,6 +1,6 @@
 "use client"
 
-import LoginDesktop from "@/components/@Desktop/Auth/LoginScreen";
+import LoginDesktop from "@/components/@Desktop/Auth/LoginDesktop";
 import Login from "@/components/Auth/Login"
 import useDevice from "@/hooks/useDevice"
 
