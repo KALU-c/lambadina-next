@@ -1,5 +1,3 @@
-"use client"
-
 import { getMentors } from "@/actions/mentors"
 import { useQuery } from "@tanstack/react-query"
 

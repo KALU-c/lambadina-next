@@ -10,23 +10,21 @@ import Pricing, { MentorWithUser } from "./Pricing";
 import CTA from "../Home/CTA";
 import FAQ from "./FAQ-accordion";
 import Footer from "../Footer";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { getMentor } from "@/actions/mentors";
-import { useAuth } from "@/hooks/useAuth";
+import MentorDetailDesktop from "../@Desktop/MentorDetail";
 
 
 type DetailsParams = {
   mentorId: string;
 };
 
-// Extend Mentor with the included user relation fields
-
 
 const Details = ({ mentorId }: DetailsParams) => {
   const { t } = useTranslation();
-
+  const [isMobile, setIsMobile] = useState(true);
   const [mentor, setMentor] = useState<MentorWithUser | null>(null);
   const [loading, setLoading] = useState(true);
   const pricingRef = useRef<HTMLDivElement | null>(null);
@@ -48,6 +46,17 @@ const Details = ({ mentorId }: DetailsParams) => {
       fetchMentor();
     }
   }, [mentorId]);
+
+	useLayoutEffect(() => {
+		const checkScreenSize = () => {
+			setIsMobile(window.innerWidth <= 768);
+		};
+		checkScreenSize();
+		window.addEventListener("resize", checkScreenSize);
+		return () => window.removeEventListener("resize", checkScreenSize);
+	}, []);
+
+  if(!isMobile) return <MentorDetailDesktop mentor={mentor} />
 
   if (loading)
     return (
