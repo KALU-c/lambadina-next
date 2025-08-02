@@ -1,6 +1,7 @@
 import React from 'react'
-import NavBarDesktop from '../components/NavBarDesktop'
 import Image from 'next/image'
+import { Lightbulb } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 const Hero = () => {
 	return (
@@ -14,7 +15,18 @@ const Hero = () => {
 				unoptimized
 			/>
 			<div className='absolute inset-0 bg-black opacity-70 -z-10' />
-			<NavBarDesktop />
+			<nav className="flex-between py-4">
+				<h1 className="text-2xl flex items-center gap-2">
+					<Lightbulb color="#FFB000" />
+					Lambadina
+				</h1>
+				<div className="flex-center gap-4">
+					<Button variant={"link"} className="text-white">Become a mentor</Button>
+					<Button variant={"link"} className="text-white">Contact us</Button>
+					<Button variant={"ghost"}>Login</Button>
+					<Button>Sign Up</Button>
+				</div>
+			</nav>
 			<div className='flex-1 h-full flex flex-col items-center justify-center gap-5'>
 				<h1 className='2xl:text-[130px] xl:text-[100px] lg:text-[80px] md:text-[60px] tracking-tighter font-semibold leading-[1.05em] flex-wrap text-center opacity-90'>Ethiopia’s First Mentorship Platform</h1>
 				<p className='2xl:text-[24px] xl:text-[20px] lg:text-[18px] md:text-[16px] opacity-80'>Don’t Hustle by yourself. Contact someone who’s been there</p>

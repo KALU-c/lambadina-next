@@ -12,6 +12,7 @@ import RatingCard from "./RatingCard";
 import FooterDesktop from "../components/Footer";
 import CtaDesktop from "./CtaDesktop";
 import FAQDesktop from "./FaqAccordionDesktop";
+import NavBarDesktop from "../components/NavBarDesktop";
 
 const MentorDetailDesktop = ({ mentor }: { mentor: MentorWithUser | null }) => {
 	const { t } = useTranslation();
@@ -22,18 +23,7 @@ const MentorDetailDesktop = ({ mentor }: { mentor: MentorWithUser | null }) => {
 	return (
 		<main className="flex flex-col space-y-40">
 			<div className="xl:px-[200px] lg:px-[150px] md:px-[50px]">
-				<nav className="flex-between py-4">
-					<h1 className="text-2xl flex items-center gap-2">
-						<Lightbulb color="#FFB000" />
-						Lambadina
-					</h1>
-					<div className="flex-center gap-4">
-						<Button variant={"link"} className="text-black">Become a mentor</Button>
-						<Button variant={"link"} className="text-black">Contact us</Button>
-						<Button variant={"ghost"}>Login</Button>
-						<Button>Sign Up</Button>
-					</div>
-				</nav>
+				<NavBarDesktop />
 
 				<div className="flex flex-row gap-2 text-lg flex-wrap">
 					<Link href={"/"}>{t("details_breadcrumb_home")}</Link>
