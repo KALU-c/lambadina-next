@@ -1,14 +1,11 @@
 "use client"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import SectionIndicatorDesktop from "../components/SectionIndicator"
 import SectionContentDesktop from "../components/SectionContent"
 import { Button } from "@/components/ui/button"
 import useMentors from "@/hooks/useMentors"
 import useCategories from "@/hooks/useCategories"
 import { useTranslation } from "react-i18next"
-import { useMemo } from "react"
-import { MentorProfile } from "@/types/mentors"
 
 const CategoriesDesktop = () => {
 	const { t } = useTranslation();
@@ -58,7 +55,6 @@ const CategoriesDesktop = () => {
 					</TabsContent>
 				</Tabs>
 			</div>
-
 		</section>
 	)
 }

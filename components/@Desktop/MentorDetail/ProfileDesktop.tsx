@@ -2,6 +2,7 @@
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { Star } from "lucide-react"
 
 type ProfileProps = {
   src: string
@@ -11,7 +12,7 @@ type ProfileProps = {
 
 const ProfileDesktop = ({ name, src, className }: ProfileProps) => {
   return (
-    <div className={cn("flex flex-col gap-2 flex-1 ", className)}>
+    <div className={cn("flex flex-col gap-4", className)}>
       <div className="relative w-full">
         <Image
           src={src}
@@ -28,7 +29,21 @@ const ProfileDesktop = ({ name, src, className }: ProfileProps) => {
         </Badge>
       </div>
 
-      <h1 className="text-2xl font-medium">{name}</h1>
+      <div className="flex flex-col gap-0">
+        <h1 className="text-2xl font-medium">{name}</h1>
+        <div className="flex flex-row gap-1 items-center">
+          <Star size={15} color="#FFB000" fill="#FFB000" />
+          <Star size={15} color="#FFB000" fill="#FFB000" />
+          <Star size={15} color="#FFB000" fill="#FFB000" />
+          <Star size={15} color="#FFB000" fill="#FFB000" />
+          <Star size={15} color="#FFB000" fill="#FFB000" />
+
+          <div className="text-[#e29a00] flex flex-row items-center ml-2">
+            <p>5.0</p>
+            <span className="text-muted-foreground text-sm ml-2">(45 reviews)</span>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
