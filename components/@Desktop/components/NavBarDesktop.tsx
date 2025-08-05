@@ -3,8 +3,8 @@ import { Button } from "../../ui/button"
 import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
 
-const NavBarDesktop = () => {
-	const { isAuthenticated } = useAuth();
+const NavBarDesktop = ({ isDarkBg }: { isDarkBg?: boolean }) => {
+	const { isAuthenticated, user, logout } = useAuth();
 
 	return (
 		<nav className="flex-between py-4">
@@ -15,8 +15,8 @@ const NavBarDesktop = () => {
 				</h1>
 			</Link>
 			<div className="flex-center gap-4">
-				<Button variant={"link"}>Become a mentor</Button>
-				<Button variant={"link"}>Contact us</Button>
+				<Button variant={"link"} className={isDarkBg ? "text-white" : "text-black"}>Become a mentor</Button>
+				<Button variant={"link"} className={isDarkBg ? "text-white" : "text-black"}>Contact us</Button>
 				{!isAuthenticated ? (
 					<>
 						<Link href={"/login"}>
@@ -26,8 +26,15 @@ const NavBarDesktop = () => {
 							<Button>Sign Up</Button>
 						</Link>
 					</>
-				): (
-					<Button variant={"outline"}>Dashboard</Button>
+				) : (
+					<>
+						{user?.user_type === "mentor" ? (
+							<Button variant={'outline'}>Dashboard</Button>
+						) : (
+							<Button variant={"outline"}>Profile</Button>
+						)}
+						<Button variant={'ghost'} onClick={logout}>Logout</Button>
+					</>
 				)}
 			</div>
 		</nav>
