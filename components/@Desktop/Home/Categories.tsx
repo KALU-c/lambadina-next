@@ -116,7 +116,7 @@ const CategoriesDesktop = () => {
 				{activeTab === "all-experts" && (
 					<>
 						{Object.entries(groupedMentors).map(([categoryName, mentors]) => (
-							<div>
+							<div key={categoryName}>
 								<div className="py-4 flex flex-col gap-4">
 									<SectionIndicatorDesktop
 										title={categoryName}

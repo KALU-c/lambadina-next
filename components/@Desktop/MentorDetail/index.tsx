@@ -49,7 +49,7 @@ const MentorDetailDesktop = ({ mentor }: { mentor: MentorWithUser | null }) => {
 
 						<div className="flex flex-col gap-6">
 							<div className="flex flex-col gap-1">
-								<h3 className="text-lg font-medium">Why it's valuable</h3>
+								<h3 className="text-lg font-medium">Why it&apos;s valuable</h3>
 
 								<div className="flex flex-row gap-1 items-center">
 									{[...Array(5)].map((_, i) => (

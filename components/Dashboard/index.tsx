@@ -62,7 +62,7 @@ const Dashboard = () => {
     }
 
     fetchBookings();
-  }, [accessToken]);
+  }, [accessToken, bookings, mentor]);
 
   if (isLoading) {
     return (

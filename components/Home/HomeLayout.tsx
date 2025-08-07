@@ -92,7 +92,7 @@ const HomeLayout = () => {
     }
 
     return results
-  }, [search, activeTab, mentors, t])
+  }, [search, activeTab, mentors])
 
   // Group mentors by their primary category (first category in their list)
   const groupedMentors = useMemo(() => {
