@@ -26,7 +26,7 @@ export default function ProfilePicture({ profileURL, setProfileURL, isEditing, i
 			{profileURL ? (
 				<>
 					<div className={cn(
-						"w-60 h-80 bg-zinc-200 rounded-xl overflow-hidden relative",
+						"w-60 h-80 md:w-100 md:h-120 bg-zinc-200 rounded-xl overflow-hidden relative",
 						isEditing && "mb-3"
 					)}>
 						<CldImage
@@ -50,7 +50,7 @@ export default function ProfilePicture({ profileURL, setProfileURL, isEditing, i
 			) : (
 				<>
 					{(!isEditing || isLoading) ? (
-						<div className="w-60 h-80 bg-zinc-200 rounded-xl flex items-center justify-center text-zinc-500 px-2 text-center">
+						<div className="w-60 h-80 md:w-100 md:h-120 bg-zinc-200 rounded-xl flex items-center justify-center text-zinc-500 px-2 text-center">
 							Click the &apos;Update&apos; Profile button below to make changes to your profile.
 						</div>
 					) : (

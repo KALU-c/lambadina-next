@@ -13,11 +13,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import i18n from "@/lib/i18n";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
@@ -311,394 +309,392 @@ const ProfileDesktop = () => {
 			<div className="xl:px-[200px] lg:px-[150px] md:px-[50px] flex flex-col">
 				<NavBarDesktop />
 
-			<div className="flex flex-col space-y-6 max-w-2xl w-2xl">
-				<div className="flex flex-row gap-2 text-lg flex-wrap">
-					<Link href={"/"} className="text-muted-foreground">{t("profile")}</Link>/
-					<span>{user?.username}</span>
-				</div>
+				<div className="flex flex-col space-y-6 max-w-2xl w-2xl">
+					<div className="flex flex-row gap-2 text-lg flex-wrap">
+						<Link href={"/"} className="text-muted-foreground">{t("profile")}</Link>/
+						<span>{user?.username}</span>
+					</div>
 
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-						{/* Profile Picture and Bio */}
-						<div className="pt-4">
-							<div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center justify-center">
-								<User2 size={18} />
-								{t("profile_picture_and_bio")}
-							</div>
-
-							<div className="flex flex-col space-y-4 items-center justify-center">
-
-								<ProfilePicture
-									isEditing={isEditing}
-									isLoading={isLoading}
-									profileURL={profileURL}
-									setProfileURL={setProfileURL}
-								/>
-
-							</div>
-						</div>
-
-
-						{/* Personal Information */}
-						<div className="pt-4">
-							<div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
-								<User2 size={18} />
-								{t("personal_information")}
-							</div>
-
-							<div className="flex flex-col space-y-4">
-								<FormField
-									control={form.control}
-									name="fullName"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>{t("full_name")}</FormLabel>
-											<FormControl>
-												<Input
-													className="bg-zinc-100 h-10"
-													disabled={!isEditing || isLoading}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="username"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>{t("username")}</FormLabel>
-											<FormControl>
-												<Input
-													className="bg-zinc-100 h-10"
-													disabled
-													// disabled={!isEditing || isLoading}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="phoneNumber"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>{t("phone_number")}</FormLabel>
-											<FormControl>
-												<Input
-													className="bg-zinc-100 h-10"
-													disabled={!isEditing || isLoading}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="email"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>{t("email")}</FormLabel>
-											<FormControl>
-												<Input
-													className="bg-zinc-100 h-10"
-													disabled={!isEditing || isLoading}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-						</div>
-
-						{/* Professional Information */}
-						{user?.user_type === "mentor" && (
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+							{/* Profile Picture and Bio */}
 							<div className="pt-4">
-								<div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
+								<div className="flex flex-row gap-2 font-medium text-lg mb-4">
 									<User2 size={18} />
-									{t("profession_information")}
+									{t("profile_picture_and_bio")}
 								</div>
 
 								<div className="flex flex-col space-y-4">
-									{user?.user_type === "mentor" && (
-										<>
-											<div className="pt-4">
-												{/* <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
+									<ProfilePicture
+										isEditing={isEditing}
+										isLoading={isLoading}
+										profileURL={profileURL}
+										setProfileURL={setProfileURL}
+									/>
+								</div>
+							</div>
+
+
+							{/* Personal Information */}
+							<div className="pt-4">
+								<div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
+									<User2 size={18} />
+									{t("personal_information")}
+								</div>
+
+								<div className="flex flex-col space-y-4">
+									<FormField
+										control={form.control}
+										name="fullName"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>{t("full_name")}</FormLabel>
+												<FormControl>
+													<Input
+														className="bg-zinc-100 h-10"
+														disabled={!isEditing || isLoading}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name="username"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>{t("username")}</FormLabel>
+												<FormControl>
+													<Input
+														className="bg-zinc-100 h-10"
+														disabled
+														// disabled={!isEditing || isLoading}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name="phoneNumber"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>{t("phone_number")}</FormLabel>
+												<FormControl>
+													<Input
+														className="bg-zinc-100 h-10"
+														disabled={!isEditing || isLoading}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name="email"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>{t("email")}</FormLabel>
+												<FormControl>
+													<Input
+														className="bg-zinc-100 h-10"
+														disabled={!isEditing || isLoading}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+							</div>
+
+							{/* Professional Information */}
+							{user?.user_type === "mentor" && (
+								<div className="pt-4">
+									<div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
+										<User2 size={18} />
+										{t("profession_information")}
+									</div>
+
+									<div className="flex flex-col space-y-4">
+										{user?.user_type === "mentor" && (
+											<>
+												<div className="pt-4">
+													{/* <div className="flex flex-row gap-2 font-medium text-lg mb-4 items-center">
 																<User2 size={18} />
 																{t("pricing")}
 															</div> */}
 
-												<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-													<span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
-														<ChevronRight size={18} />
-														Basic Plan
-													</span>
-													<div className="mb-8 flex flex-col gap-4">
-														<FormField
-															control={form.control}
-															name="basicPrice"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Basic Price (ETB/min)</FormLabel>
-																	<FormControl>
-																		<Input
-																			type="number"
-																			className="bg-zinc-100 h-10"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-														<FormField
-															control={form.control}
-															name="basicDescription"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Basic Plan Description</FormLabel>
-																	<FormControl>
-																		<Input
-																			className="bg-zinc-100 h-10"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-														<FormField
-															control={form.control}
-															name="basicPlanBenefits"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Basic Plan Benefits</FormLabel>
-																	<FormControl>
-																		<Textarea
-																			className="bg-zinc-100 h-40"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-													</div>
-													<span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
-														<ChevronRight size={18} />
-														Standard Plan
-													</span>
-													<div className="mb-8 flex flex-col gap-4">
-														<FormField
-															control={form.control}
-															name="standardPrice"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Standard Price (ETB/min)</FormLabel>
-																	<FormControl>
-																		<Input
-																			type="number"
-																			className="bg-zinc-100 h-10"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-														<FormField
-															control={form.control}
-															name="standardDescription"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Standard Plan Description</FormLabel>
-																	<FormControl>
-																		<Input
-																			className="bg-zinc-100 h-10"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-														<FormField
-															control={form.control}
-															name="standardPlanBenefits"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Standard Plan Benefits</FormLabel>
-																	<FormControl>
-																		<Textarea
-																			className="bg-zinc-100 h-40"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-													</div>
-													<span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
-														<ChevronRight size={18} />
-														Premium Plan
-													</span>
-													<div className="mb-6 flex flex-col gap-4">
-														<FormField
-															control={form.control}
-															name="premiumPrice"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Premium Price (ETB/min)</FormLabel>
-																	<FormControl>
-																		<Input
-																			type="number"
-																			className="bg-zinc-100 h-10"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-														<FormField
-															control={form.control}
-															name="premiumDescription"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Premium Plan Description</FormLabel>
-																	<FormControl>
-																		<Input
-																			className="bg-zinc-100 h-10"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
-														<FormField
-															control={form.control}
-															name="premiumPlanBenefits"
-															render={({ field }) => (
-																<FormItem>
-																	<FormLabel>Premium Plan Benefits</FormLabel>
-																	<FormControl>
-																		<Textarea
-																			className="bg-zinc-100 h-40"
-																			disabled={!isEditing || isLoading}
-																			{...field}
-																		/>
-																	</FormControl>
-																	<FormMessage />
-																</FormItem>
-															)}
-														/>
+													<div className="grid grid-cols-1 gap-4">
+														<span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
+															<ChevronRight size={18} />
+															Basic Plan
+														</span>
+														<div className="mb-8 flex flex-col gap-4">
+															<FormField
+																control={form.control}
+																name="basicPrice"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Basic Price (ETB/min)</FormLabel>
+																		<FormControl>
+																			<Input
+																				type="number"
+																				className="bg-zinc-100 h-10"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+															<FormField
+																control={form.control}
+																name="basicDescription"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Basic Plan Description</FormLabel>
+																		<FormControl>
+																			<Input
+																				className="bg-zinc-100 h-10"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+															<FormField
+																control={form.control}
+																name="basicPlanBenefits"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Basic Plan Benefits</FormLabel>
+																		<FormControl>
+																			<Textarea
+																				className="bg-zinc-100 h-40"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+														</div>
+														<span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
+															<ChevronRight size={18} />
+															Standard Plan
+														</span>
+														<div className="mb-8 flex flex-col gap-4">
+															<FormField
+																control={form.control}
+																name="standardPrice"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Standard Price (ETB/min)</FormLabel>
+																		<FormControl>
+																			<Input
+																				type="number"
+																				className="bg-zinc-100 h-10"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+															<FormField
+																control={form.control}
+																name="standardDescription"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Standard Plan Description</FormLabel>
+																		<FormControl>
+																			<Input
+																				className="bg-zinc-100 h-10"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+															<FormField
+																control={form.control}
+																name="standardPlanBenefits"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Standard Plan Benefits</FormLabel>
+																		<FormControl>
+																			<Textarea
+																				className="bg-zinc-100 h-40"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+														</div>
+														<span className="w-full p-2 rounded-lg gap-1 bg-zinc-200 flex items-center">
+															<ChevronRight size={18} />
+															Premium Plan
+														</span>
+														<div className="mb-6 flex flex-col gap-4">
+															<FormField
+																control={form.control}
+																name="premiumPrice"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Premium Price (ETB/min)</FormLabel>
+																		<FormControl>
+																			<Input
+																				type="number"
+																				className="bg-zinc-100 h-10"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+															<FormField
+																control={form.control}
+																name="premiumDescription"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Premium Plan Description</FormLabel>
+																		<FormControl>
+																			<Input
+																				className="bg-zinc-100 h-10"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+															<FormField
+																control={form.control}
+																name="premiumPlanBenefits"
+																render={({ field }) => (
+																	<FormItem>
+																		<FormLabel>Premium Plan Benefits</FormLabel>
+																		<FormControl>
+																			<Textarea
+																				className="bg-zinc-100 h-40"
+																				disabled={!isEditing || isLoading}
+																				{...field}
+																			/>
+																		</FormControl>
+																		<FormMessage />
+																	</FormItem>
+																)}
+															/>
+														</div>
 													</div>
 												</div>
-											</div>
-											<FormField
-												control={form.control}
-												name="is_available"
-												render={({ field }) => (
-													<FormItem className="flex flex-row items-center justify-between gap-4 bg-zinc-200 p-3 rounded-lg">
-														<FormLabel className="text-md font-[400]">
-															<ChevronRight size={18} />
-															Accepting New Clients
-														</FormLabel>
-														<FormControl>
-															<Switch
-																checked={field.value}
-																onCheckedChange={field.onChange}
-																disabled={!isEditing || isLoading}
-															/>
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-											<FormField
-												control={form.control}
-												name="bio"
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>{t("bio")}</FormLabel>
-														<FormControl>
-															<Textarea
-																className="bg-zinc-100 h-52"
-																disabled={!isEditing || isLoading}
-																{...field}
-															/>
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
+												<FormField
+													control={form.control}
+													name="is_available"
+													render={({ field }) => (
+														<FormItem className="flex flex-row items-center justify-between gap-4 bg-zinc-200 p-3 rounded-lg">
+															<FormLabel className="text-md font-[400]">
+																<ChevronRight size={18} />
+																Accepting New Clients
+															</FormLabel>
+															<FormControl>
+																<Switch
+																	checked={field.value}
+																	onCheckedChange={field.onChange}
+																	disabled={!isEditing || isLoading}
+																/>
+															</FormControl>
+															<FormMessage />
+														</FormItem>
+													)}
+												/>
+												<FormField
+													control={form.control}
+													name="bio"
+													render={({ field }) => (
+														<FormItem>
+															<FormLabel>{t("bio")}</FormLabel>
+															<FormControl>
+																<Textarea
+																	className="bg-zinc-100 h-52"
+																	disabled={!isEditing || isLoading}
+																	{...field}
+																/>
+															</FormControl>
+															<FormMessage />
+														</FormItem>
+													)}
+												/>
+											</>
+										)}
+
+									</div>
+								</div>
+							)}
+
+							{/* Security */}
+							<div className="pt-4">
+								<div className="flex flex-row gap-2 font-medium text-lg mb-4">
+									<User2 />
+									{t("security")}
+								</div>
+
+								<Button variant="secondary" disabled>{t("update_password")}</Button>
+
+								<div className="py-4 flex flex-row w-full items-center gap-2">
+									{isEditing && (
+										<>
+											<Button type="submit" className="flex-4/6" disabled={isLoading}>
+												<Loader className={isLoading ? "animate-spin" : "hidden"} />
+												{t("save_changes")}
+											</Button>
+											<Button
+												disabled={isLoading}
+												type="button"
+												variant="secondary"
+												className="flex-2/4"
+												onClick={() => setIsEditing(false)}
+											>
+												{t("cancel")}
+											</Button>
 										</>
 									)}
-
 								</div>
 							</div>
-						)}
-
-						{/* Security */}
-						<div className="pt-4">
-							<div className="flex flex-row gap-2 font-medium text-lg mb-4">
-								<User2 />
-								{t("security")}
-							</div>
-
-							<Button variant="secondary" disabled>{t("update_password")}</Button>
-
-							<div className="py-4 flex flex-row w-full items-center gap-2">
-								{isEditing && (
-									<>
-										<Button type="submit" className="flex-4/6" disabled={isLoading}>
-											<Loader className={isLoading ? "animate-spin" : "hidden"} />
-											{t("save_changes")}
-										</Button>
-										<Button
-											disabled={isLoading}
-											type="button"
-											variant="secondary"
-											className="flex-2/4"
-											onClick={() => setIsEditing(false)}
-										>
-											{t("cancel")}
-										</Button>
-									</>
-								)}
-							</div>
-						</div>
-					</form>
-				</Form>
-				{!isEditing && (
-					<Button
-						disabled={loading}
-						type="button"
-						className="w-full"
-						onClick={() => setIsEditing(true)}
-					>
-						{t("update_profile")}
-					</Button>
-				)}
-			</div>
+						</form>
+					</Form>
+					{!isEditing && (
+						<Button
+							disabled={loading}
+							type="button"
+							className="w-full"
+							onClick={() => setIsEditing(true)}
+						>
+							{t("update_profile")}
+						</Button>
+					)}
+				</div>
 			</div>
 
 			<FooterDesktop />

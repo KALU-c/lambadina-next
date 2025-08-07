@@ -15,8 +15,8 @@ const NavBarDesktop = ({ isDarkBg }: { isDarkBg?: boolean }) => {
 				</h1>
 			</Link>
 			<div className="flex-center gap-4">
-				<Button variant={"link"} className={isDarkBg ? "text-white" : "text-black"}>Become a mentor</Button>
-				<Button variant={"link"} className={isDarkBg ? "text-white" : "text-black"}>Contact us</Button>
+				{/* <Button variant={"link"} className={isDarkBg ? "text-white" : "text-black"}>Become a mentor</Button>
+				<Button variant={"link"} className={isDarkBg ? "text-white" : "text-black"}>Contact us</Button> */}
 				{!isAuthenticated ? (
 					<>
 						<Link href={"/login"}>
@@ -29,9 +29,18 @@ const NavBarDesktop = ({ isDarkBg }: { isDarkBg?: boolean }) => {
 				) : (
 					<>
 						{user?.user_type === "mentor" ? (
-							<Button variant={'outline'}>Dashboard</Button>
+							<>
+								<Link href="/dashboard">
+									<Button variant={'outline'}>Dashboard</Button>
+								</Link>
+								<Link href={"/profile"}>
+									<Button variant={"secondary"}>Profile</Button>
+								</Link>
+							</>
 						) : (
-							<Button variant={"outline"}>Profile</Button>
+							<Link href={"/profile"}>
+								<Button variant={"outline"}>Profile</Button>
+							</Link>
 						)}
 						<Button variant={'ghost'} onClick={logout}>Logout</Button>
 					</>
