@@ -31,7 +31,7 @@ const ProfileDesktop = ({ name, src, className }: ProfileProps) => {
 
       <div className="flex flex-col gap-0">
         <h1 className="text-2xl font-medium">{name}</h1>
-        <div className="flex flex-row gap-1 items-center">
+        {/* <div className="flex flex-row gap-1 items-center">
           <Star size={15} color="#FFB000" fill="#FFB000" />
           <Star size={15} color="#FFB000" fill="#FFB000" />
           <Star size={15} color="#FFB000" fill="#FFB000" />
@@ -42,7 +42,7 @@ const ProfileDesktop = ({ name, src, className }: ProfileProps) => {
             <p>5.0</p>
             <span className="text-muted-foreground text-sm ml-2">(45 reviews)</span>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )
