@@ -17,25 +17,33 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { useTranslation } from "react-i18next"
+import { Tabs } from "@/components/ui/tabs"
+import { Category } from "@prisma/client"
 
-const categories = [
-	{ value: "all-experts", label: "All Mentors" },
-	{ value: "top-experts", label: "Top Mentors" },
-	{ value: "business-experts", label: "Business" },
-	{ value: "wellness", label: "Wellness" },
-	{ value: "career-business", label: "Career & Business" },
-	{ value: "style-beauty", label: "Style & Beauty" },
-	{ value: "astrology", label: "Astrology & More" },
-]
-
-export function CustomTabTrigger({ children }: { children: React.ReactNode }) {
+export function CustomTabTrigger({
+	children,
+	activeTab,
+	setActiveTab,
+	categories
+}: {
+	children: React.ReactNode,
+	activeTab: string
+	setActiveTab: React.Dispatch<React.SetStateAction<string>>
+	categories: Category[]
+}) {
 	const [open, setOpen] = React.useState(false)
-	const [selectedTab, setSelectedTab] = React.useState("all-experts")
+
+	const allCategories = [
+		{ value: "all-experts", label: "All Mentors" },
+		{ value: "top-experts", label: "Top Mentors" },
+		...categories.map(category => ({
+			value: category.name.toLowerCase().split(' ').join('-'),
+			label: category.name
+		}))
+	]
 
 	return (
-		<Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full space-y-8">
+		<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
 			<div className="flex justify-center">
 				<Popover open={open} onOpenChange={setOpen}>
 					<PopoverTrigger asChild>
@@ -45,7 +53,7 @@ export function CustomTabTrigger({ children }: { children: React.ReactNode }) {
 							aria-expanded={open}
 							className="w-[400px] justify-between"
 						>
-							{categories.find(c => c.value === selectedTab)?.label ?? "Select category"}
+							{allCategories.find(c => c.value === activeTab)?.label ?? "Select category"}
 							<ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 						</Button>
 					</PopoverTrigger>
@@ -55,19 +63,19 @@ export function CustomTabTrigger({ children }: { children: React.ReactNode }) {
 							<CommandList>
 								<CommandEmpty>No category found.</CommandEmpty>
 								<CommandGroup>
-									{categories.map(category => (
+									{allCategories.map(category => (
 										<CommandItem
 											key={category.value}
 											value={category.value}
 											onSelect={(value) => {
-												setSelectedTab(value)
+												setActiveTab(value)
 												setOpen(false)
 											}}
 										>
 											<CheckIcon
 												className={cn(
 													"mr-2 h-4 w-4",
-													selectedTab === category.value ? "opacity-100" : "opacity-0"
+													activeTab === category.value ? "opacity-100" : "opacity-0"
 												)}
 											/>
 											{category.label}
