@@ -6,11 +6,26 @@ import { Button } from "@/components/ui/button"
 import useMentors from "@/hooks/useMentors"
 import useCategories from "@/hooks/useCategories"
 import { useTranslation } from "react-i18next"
+import { Suspense } from "react"
+import { MentorProfile } from "@/types/mentors"
+import ExpertsCardSkeleton from "@/components/Home/layout/experts-card-skeleton"
+import ExpertCardDesktop from "../components/ExpertCard"
+import SectionIndicatorDesktop from "../components/SectionIndicator"
 
 const CategoriesDesktop = () => {
 	const { t } = useTranslation();
 	const { isPending: isCategoriesPending, data: categories } = useCategories();
 	const { isPending: isMentorsPending, data: mentors } = useMentors();
+
+	const renderMentorsList = (mentorsToRender: MentorProfile[]) => (
+		<div className="flex flex-row gap-6 overflow-x-auto scrollbar-hide py-2 -mx-[22px] px-[22px]">
+			{mentorsToRender.map(mentor => (
+				<Suspense key={mentor.id} fallback={<ExpertsCardSkeleton />}>
+					<ExpertCardDesktop mentor={mentor} />
+				</Suspense>
+			))}
+		</div>
+	)
 
 	if (isCategoriesPending || isMentorsPending) {
 		return (
@@ -41,11 +56,23 @@ const CategoriesDesktop = () => {
 					</TabsList>
 
 					<TabsContent value="all-experts" className="flex flex-col space-y-4">
-						<SectionContentDesktop />
-						<SectionContentDesktop />
-						<SectionContentDesktop />
-						<SectionContentDesktop />
-						<SectionContentDesktop />
+						<div className="py-4">
+							<SectionIndicatorDesktop />
+							<div
+								className="pt-4 flex flex-row justify-between lg:gap-8 gap-4 flex-wrap md:justify-start"
+							>
+								{renderMentorsList(mentors?.mentors as MentorProfile[])}
+							</div>
+						</div>
+					</TabsContent>
+
+					<TabsContent value="all-experts" className="flex flex-col space-y-4">
+						<div className="py-4">
+							<SectionIndicatorDesktop />
+							<div className="pt-4 flex flex-row justify-between lg:gap-8 gap-4 flex-wrap md:justify-start">
+								{renderMentorsList(mentors?.mentors.filter(mentor => mentor.rating >= 4.5) as MentorProfile[])}
+							</div>
+						</div>
 					</TabsContent>
 					<TabsContent value="all_experts2">
 						<SectionContentDesktop />
