@@ -13,10 +13,10 @@ const SectionIndicatorDesktop = () => {
 				<p className="text-xl text-muted-foreground tracking-tight">Access to the best experts has never been easier</p>
 			</div>
 
-			<div className="flex items-center gap-2">
+			{/* <div className="flex items-center gap-2">
 				<span className="text-muted-foreground text-lg">See All</span>
 				<ArrowRight size={16} />
-			</div>
+			</div> */}
 		</div>
 	)
 }

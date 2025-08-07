@@ -11,21 +11,16 @@ import { MentorProfile } from "@/types/mentors"
 import ExpertsCardSkeleton from "@/components/Home/layout/experts-card-skeleton"
 import ExpertCardDesktop from "../components/ExpertCard"
 import SectionIndicatorDesktop from "../components/SectionIndicator"
+import ExpertsCardCarousel from "../components/ExpertsCardCarousel"
+import { CustomTabTrigger } from "../components/CustomTabTrigger"
 
 const CategoriesDesktop = () => {
 	const { t } = useTranslation();
 	const { isPending: isCategoriesPending, data: categories } = useCategories();
 	const { isPending: isMentorsPending, data: mentors } = useMentors();
 
-	const renderMentorsList = (mentorsToRender: MentorProfile[]) => (
-		<div className="flex flex-row gap-6 overflow-x-auto scrollbar-hide py-2 -mx-[22px] px-[22px]">
-			{mentorsToRender.map(mentor => (
-				<Suspense key={mentor.id} fallback={<ExpertsCardSkeleton />}>
-					<ExpertCardDesktop mentor={mentor} />
-				</Suspense>
-			))}
-		</div>
-	)
+	console.log(categories, mentors)
+	console.log("filtered: ", mentors?.mentors.filter(mentor => mentor.categories.some(c => c.id === 36)))
 
 	if (isCategoriesPending || isMentorsPending) {
 		return (
@@ -40,46 +35,52 @@ const CategoriesDesktop = () => {
 		<section className="xl:px-[200px] lg:px-[100px] md:px-[50px] pt-10">
 			<div className="flex flex-col gap-4">
 				<div className="flex flex-col">
-					<h1 className="text-4xl text-center font-medium">Categories</h1>
-					<Button variant={"link"} className="text-muted-foreground">See All Categories</Button>
+					<h1 className="text-3xl text-center font-medium">Categories</h1>
 				</div>
 				<Tabs defaultValue="all-experts" className="h-full flex flex-col space-y-6">
-					<TabsList className="flex flex-row items-start bg-zinc-100 gap-6 justify-start flex-wrap overflow-hidden lg:px-16 md:px-12 w-fit self-center mb-12">
-						<TabsTrigger value="all-experts">{t('all_mentors')}</TabsTrigger>
-						<TabsTrigger value="top-experts">{t('top_mentors')}</TabsTrigger>
-						<TabsTrigger value="business-experts">{t('business')}</TabsTrigger>
 
-						<TabsTrigger value="all_experts4">Wellness</TabsTrigger>
-						<TabsTrigger value="all_experts5">Career & Business</TabsTrigger>
-						<TabsTrigger value="all_experts6">Style & Beauty</TabsTrigger>
-						<TabsTrigger value="al">Astrology & More</TabsTrigger>
-					</TabsList>
+					<CustomTabTrigger>
+						<TabsContent value="all-experts" className="flex flex-col space-y-4">
+							<div className="py-4 flex flex-col gap-4">
+								<SectionIndicatorDesktop />
+								<ExpertsCardCarousel
+									mentors={mentors?.mentors as MentorProfile[]}
+								/>
+							</div>
+						</TabsContent>
 
-					<TabsContent value="all-experts" className="flex flex-col space-y-4">
-						<div className="py-4">
-							<SectionIndicatorDesktop />
-							<div
-								className="pt-4 flex flex-row justify-between lg:gap-8 gap-4 flex-wrap md:justify-start"
+						<TabsContent value="top-experts" className="flex flex-col space-y-4">
+							<div className="py-4 flex flex-col gap-4">
+								<SectionIndicatorDesktop />
+								<ExpertsCardCarousel
+									mentors={mentors?.mentors.filter(mentor => mentor.rating >= 4.5) as MentorProfile[]}
+								/>
+							</div>
+						</TabsContent>
+
+						<TabsContent value="business-experts" className="flex flex-col space-y-4">
+							<div className="py-4 flex flex-col gap-4">
+								<SectionIndicatorDesktop />
+								<ExpertsCardCarousel
+									mentors={mentors?.mentors.filter(mentor => mentor.categories.some(category => category.name.toLowerCase().includes('business'))) as MentorProfile[]}
+								/>
+							</div>
+						</TabsContent>
+
+						{categories?.categories.map(category => (
+							<TabsContent
+								key={category.id}
+								value={category.name.toLowerCase().split(' ').join('-')}
 							>
-								{renderMentorsList(mentors?.mentors as MentorProfile[])}
-							</div>
-						</div>
-					</TabsContent>
-
-					<TabsContent value="all-experts" className="flex flex-col space-y-4">
-						<div className="py-4">
-							<SectionIndicatorDesktop />
-							<div className="pt-4 flex flex-row justify-between lg:gap-8 gap-4 flex-wrap md:justify-start">
-								{renderMentorsList(mentors?.mentors.filter(mentor => mentor.rating >= 4.5) as MentorProfile[])}
-							</div>
-						</div>
-					</TabsContent>
-					<TabsContent value="all_experts2">
-						<SectionContentDesktop />
-					</TabsContent>
-					<TabsContent value="all_expert3">
-						<SectionContentDesktop />
-					</TabsContent>
+								<div className="py-4 flex flex-col gap-4">
+									<SectionIndicatorDesktop />
+									<ExpertsCardCarousel
+										mentors={mentors?.mentors.filter(mentor => mentor.categories.some(c => c.id === category.id)) as MentorProfile[]}
+									/>
+								</div>
+							</TabsContent>
+						))}
+					</CustomTabTrigger>
 				</Tabs>
 			</div>
 		</section>
